@@ -441,23 +441,48 @@ export function formatReport(report: AuditReport): string {
   return lines.join("\n");
 }
 
-/** 점수만 간결하게 포맷 (score 모드) */
+/** 카테고리별 상세 점수 리포트 */
 export function formatScore(report: AuditReport): string {
-  const bar = renderBar(report.score);
-  const critical = report.summary.byCritical.passed === report.summary.byCritical.total
-    ? "OK" : `${report.summary.byCritical.passed}/${report.summary.byCritical.total}`;
-  const failCount = report.summary.failed;
-  const topFix = report.checks.find((c) => !c.pass && c.severity === "critical")
-    ?? report.checks.find((c) => !c.pass);
+  const lines: string[] = [];
 
-  let result = `${bar}  ${report.score}/100 (${report.grade})  |  ${report.summary.passed}/${report.summary.total} passed  |  critical: ${critical}`;
+  lines.push(`## Harness Score Report`);
+  lines.push(``);
+  lines.push(`${renderBar(report.score)}  **${report.score}/100 (${report.grade})**`);
+  lines.push(``);
 
-  if (topFix) {
-    result += `\nTop fix: ${topFix.name}`;
-    if (topFix.fix) result += ` — ${topFix.fix}`;
+  const catNames: Record<AuditCategory, string> = {
+    context: "Context Engineering",
+    workflow: "Workflow",
+    constraints: "Constraints",
+    eval: "Eval System",
+    conventions: "Conventions",
+    build: "Build & Test",
+    docs: "Documentation",
+  };
+
+  // 카테고리별 점수 + 항목 상세
+  for (const [cat, label] of Object.entries(catNames)) {
+    const catChecks = report.checks.filter((c) => c.category === cat);
+    if (catChecks.length === 0) continue;
+
+    const passed = catChecks.filter((c) => c.pass).length;
+    const catScore = Math.round((passed / catChecks.length) * 100);
+    const catBar = renderBar(catScore);
+
+    lines.push(`### ${label}  ${catBar}  ${catScore}/100  (${passed}/${catChecks.length})`);
+    lines.push(``);
+
+    for (const c of catChecks) {
+      const icon = c.pass ? "PASS" : "FAIL";
+      lines.push(`- [${icon}] ${c.name}`);
+      if (!c.pass && c.fix) {
+        lines.push(`  -> ${c.fix}`);
+      }
+    }
+    lines.push(``);
   }
 
-  return result;
+  return lines.join("\n");
 }
 
 function renderBar(score: number): string {
