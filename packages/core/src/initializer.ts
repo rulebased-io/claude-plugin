@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { InitOptions, InitResult } from "./types.js";
+import type { InitOptions, InitResult, PresetName } from "./types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = join(__dirname, "../../templates");
@@ -19,6 +19,17 @@ export function initHarness(projectPath: string, options: InitOptions = {}): Ini
   const skipped: string[] = [];
 
   const projectName = options.projectName || guessProjectName(projectPath);
+  const preset: PresetName = options.preset ?? "standard";
+
+  // 0. .harness.json
+  writeTemplate(
+    projectPath,
+    ".harness.json",
+    JSON.stringify({ preset }, null, 2) + "\n",
+    options.force,
+    created,
+    skipped,
+  );
 
   // 1. AGENTS.md
   writeTemplate(

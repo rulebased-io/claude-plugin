@@ -9,7 +9,8 @@
     "./auditor": "./dist/auditor.js",
     "./recommender": "./dist/recommender.js",
     "./initializer": "./dist/initializer.js",
-    "./types": "./dist/types.js"
+    "./types": "./dist/types.js",
+    "./presets": "./dist/presets.js"
   },
   "scripts": {
     "build": "tsc",

@@ -9,11 +9,30 @@
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import type { AuditCheck, AuditCategory, AuditReport } from "./types.js";
+import type { AuditCheck, AuditCategory, AuditReport, HarnessConfig } from "./types.js";
+import { getPreset, mergeConfig, isCheckDisabled, getSeverity } from "./presets.js";
+
+/** .harness.json 로드 (없으면 standard 프리셋) */
+export function loadConfig(projectPath: string): HarnessConfig {
+  const configPath = join(projectPath, ".harness.json");
+  const base = getPreset("standard");
+
+  if (!existsSync(configPath)) return base;
+
+  try {
+    const raw = JSON.parse(readFileSync(configPath, "utf-8"));
+    const preset = raw.preset ? getPreset(raw.preset) : base;
+    return mergeConfig(preset, raw);
+  } catch {
+    return base;
+  }
+}
 
 /** 프로젝트 경로에 대해 하네스 감사 실행 */
-export function audit(projectPath: string): AuditReport {
-  const checks: AuditCheck[] = [
+export function audit(projectPath: string, config?: HarnessConfig): AuditReport {
+  const cfg = config ?? loadConfig(projectPath);
+
+  const allChecks: AuditCheck[] = [
     ...auditContext(projectPath),
     ...auditWorkflow(projectPath),
     ...auditConstraints(projectPath),
@@ -22,6 +41,14 @@ export function audit(projectPath: string): AuditReport {
     ...auditBuild(projectPath),
     ...auditDocs(projectPath),
   ];
+
+  // 프리셋/설정에 따라 체크 필터링 + 심각도 오버라이드
+  const checks = allChecks
+    .filter((c) => !isCheckDisabled(c.id, cfg))
+    .map((c) => ({
+      ...c,
+      severity: getSeverity(c.id, c.severity, cfg),
+    }));
 
   return buildReport(projectPath, checks);
 }
@@ -412,4 +439,29 @@ export function formatReport(report: AuditReport): string {
   }
 
   return lines.join("\n");
+}
+
+/** 점수만 간결하게 포맷 (score 모드) */
+export function formatScore(report: AuditReport): string {
+  const bar = renderBar(report.score);
+  const critical = report.summary.byCritical.passed === report.summary.byCritical.total
+    ? "OK" : `${report.summary.byCritical.passed}/${report.summary.byCritical.total}`;
+  const failCount = report.summary.failed;
+  const topFix = report.checks.find((c) => !c.pass && c.severity === "critical")
+    ?? report.checks.find((c) => !c.pass);
+
+  let result = `${bar}  ${report.score}/100 (${report.grade})  |  ${report.summary.passed}/${report.summary.total} passed  |  critical: ${critical}`;
+
+  if (topFix) {
+    result += `\nTop fix: ${topFix.name}`;
+    if (topFix.fix) result += ` — ${topFix.fix}`;
+  }
+
+  return result;
+}
+
+function renderBar(score: number): string {
+  const filled = Math.round(score / 5);
+  const empty = 20 - filled;
+  return "[" + "#".repeat(filled) + "-".repeat(empty) + "]";
 }

@@ -52,12 +52,24 @@ export interface Recommendation {
   targetPath?: string;     // 생성할 파일 경로
 }
 
+// ─── Preset ───
+
+export type PresetName = "minimal" | "standard";
+
+export interface HarnessConfig {
+  preset?: PresetName;
+  checks?: {
+    enable?: string[];
+    disable?: string[];
+  };
+  severity?: Record<string, "critical" | "important" | "nice-to-have">;
+}
+
 // ─── Init ───
 
 export interface InitOptions {
   projectName?: string;
-  framework?: string;
-  language?: string;
+  preset?: PresetName;
   skipWorkflow?: boolean;
   force?: boolean;
 }
