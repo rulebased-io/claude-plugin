@@ -10,7 +10,9 @@
     "./recommender": "./dist/recommender.js",
     "./initializer": "./dist/initializer.js",
     "./types": "./dist/types.js",
-    "./presets": "./dist/presets.js"
+    "./presets": "./dist/presets.js",
+    "./transcript": "./dist/transcript.js",
+    "./log-evaluator": "./dist/log-evaluator.js"
   },
   "scripts": {
     "build": "tsc",

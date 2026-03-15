@@ -12,6 +12,8 @@ import { resolve } from "node:path";
 import { audit, formatReport, formatScore } from "@rulebased/core/auditor";
 import { recommend, formatRecommendations } from "@rulebased/core/recommender";
 import { initHarness } from "@rulebased/core/initializer";
+import { findLatestTranscript, parseTranscript, computeStats } from "@rulebased/core/transcript";
+import { evaluateLog, formatLogEval } from "@rulebased/core/log-evaluator";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -26,8 +28,10 @@ function printUsage(): void {
 
   Commands:
     audit [path]          Audit harness coverage (17 criteria, score 0-100)
+    score [path]          Per-category harness score report
     recommend [path]      Recommend missing harness elements (by priority)
     init [path]           Initialize harness structure (AGENTS.md, specs/, tasks/)
+    eval-log [path]       Evaluate conversation log against harness compliance
 
   Options:
     --force               Overwrite existing files (init)
@@ -118,6 +122,28 @@ switch (command) {
       console.log(JSON.stringify(recs, null, 2));
     } else {
       console.log(formatRecommendations(recs));
+    }
+    break;
+  }
+
+  case "eval-log": {
+    const projectPath = getProjectPath();
+    const transcriptPath = getOption("--file") ?? findLatestTranscript(projectPath);
+
+    if (!transcriptPath) {
+      console.error("No transcript found. Specify a path with --file or run from a project with Claude Code history.");
+      process.exit(1);
+    }
+
+    console.log(`Evaluating: ${transcriptPath}\n`);
+    const events = parseTranscript(transcriptPath);
+    const stats = computeStats(events);
+    const report = evaluateLog(stats);
+
+    if (hasFlag("--json")) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log(formatLogEval(report));
     }
     break;
   }
