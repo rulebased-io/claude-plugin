@@ -1,10 +1,6 @@
 ---
-name: harness-recommend
+name: recommend
 description: Recommends missing harness elements for your project and auto-generates them (AGENTS.md, lint, eval, CI, etc.)
-license: MIT
-metadata:
-  author: rulebased-io
-  version: "1.0.0"
 ---
 
 Audits the current project's harness state and recommends missing elements.

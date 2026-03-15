@@ -1,10 +1,6 @@
 ---
-name: harness-eval-log
+name: eval-log
 description: Evaluates a Claude Code conversation log against harness compliance — measures human intervention, agent autonomy, tool usage, and session patterns
-license: MIT
-metadata:
-  author: rulebased-io
-  version: "1.0.0"
 ---
 
 Evaluates a Claude Code conversation transcript against harness engineering compliance.

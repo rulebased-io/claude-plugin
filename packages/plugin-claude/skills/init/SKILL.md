@@ -1,10 +1,6 @@
 ---
-name: harness-init
+name: init
 description: Initializes the harness structure for the current project (AGENTS.md, specs/, tasks/, etc.)
-license: MIT
-metadata:
-  author: rulebased-io
-  version: "1.0.0"
 ---
 
 Initializes the harness engineering structure for the current project.

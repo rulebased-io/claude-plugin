@@ -1,10 +1,6 @@
 ---
-name: harness-score
+name: score
 description: Scores your project's harness engineering setup by category and generates a report
-license: MIT
-metadata:
-  author: rulebased-io
-  version: "1.0.0"
 ---
 
 Scores your project's harness engineering setup by category and generates a report.

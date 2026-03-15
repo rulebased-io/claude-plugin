@@ -1,10 +1,6 @@
 ---
-name: harness-audit
+name: audit
 description: Audits your project's harness engineering setup and assigns a score (checks 17 items including AGENTS.md, specs, constraints, eval, etc.)
-license: MIT
-metadata:
-  author: rulebased-io
-  version: "1.0.0"
 ---
 
 Audits the current project's harness engineering setup.
