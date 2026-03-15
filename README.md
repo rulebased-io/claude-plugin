@@ -17,7 +17,7 @@ A harness-building tool for AI agents. Assess how well your project's harness en
 /plugin marketplace add rulebased-io/harness
 
 # Step 2: Install the plugin
-/plugin install rulebased@rulebased-harness
+/plugin install rulebased@harness
 ```
 
 2. Or test locally during development:

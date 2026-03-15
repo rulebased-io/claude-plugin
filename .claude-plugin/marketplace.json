@@ -1,5 +1,5 @@
 {
-  "name": "rulebased-harness",
+  "name": "harness",
   "description": "Harness engineering tools for AI agents by rulebased.io",
   "plugins": [
     {
