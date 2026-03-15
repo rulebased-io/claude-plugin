@@ -17,7 +17,7 @@ AI 에이전트를 위한 하네스 구축 도구. 프로젝트의 하네스 엔
 /plugin marketplace add rulebased-io/harness
 
 # 2단계: 플러그인 설치
-/plugin install rulebased@rulebased-io-harness
+/plugin install rulebased@rulebased-harness
 ```
 
 2. 또는 개발 중 로컬에서 테스트:
