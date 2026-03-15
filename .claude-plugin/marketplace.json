@@ -1,20 +1,23 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "rulebased-harness",
+  "version": "1.2.0",
+  "description": "Harness engineering tools for AI agents",
   "owner": {
     "name": "rulebased.io",
-    "email": "jungyoun@rulebased.io"
-  },
-  "metadata": {
-    "description": "Harness engineering tools for AI agents"
+    "email": "jungyoun@rulebased.io",
+    "url": "https://rulebased.io"
   },
   "plugins": [
     {
       "name": "rulebased",
       "description": "Harness audit, score, init, recommend, and eval-log for AI agent projects",
-      "source": "./packages/plugin-claude",
+      "source": "./plugins/rulebased",
       "version": "1.2.0",
+      "category": "development",
       "author": {
-        "name": "rulebased.io"
+        "name": "rulebased.io",
+        "email": "jungyoun@rulebased.io"
       }
     }
   ]

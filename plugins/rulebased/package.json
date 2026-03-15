@@ -1,0 +1,7 @@
+{
+  "name": "@rulebased/plugin-claude",
+  "version": "1.0.0",
+  "description": "Claude Code plugin - harness-init, harness-audit, harness-recommend skills",
+  "private": true,
+  "license": "MIT"
+}
