@@ -1,7 +1,7 @@
 {
   "name": "@rulebased/cli",
   "version": "1.0.0",
-  "description": "Harness CLI - npx rulebased-harness audit/init/recommend",
+  "description": "Harness CLI - audit, init, recommend harness engineering setup for AI agents",
   "type": "module",
   "bin": {
     "rulebased-harness": "dist/index.js"
@@ -17,5 +17,12 @@
     "typescript": "^5.5.0"
   },
   "files": ["dist/"],
+  "homepage": "https://rulebased.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rulebased-io/harness",
+    "directory": "packages/cli"
+  },
+  "keywords": ["harness", "cli", "ai-agent", "audit", "harness-engineering"],
   "license": "MIT"
 }
