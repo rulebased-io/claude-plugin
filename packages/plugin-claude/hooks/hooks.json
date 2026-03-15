@@ -1,4 +1,16 @@
 {
-  "$schema": "https://claude.ai/schemas/hooks.json",
-  "description": "하네스 플러그인 자동화 훅"
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/eval-on-stop.sh",
+            "async": true,
+            "statusMessage": "Evaluating session harness compliance..."
+          }
+        ]
+      }
+    ]
+  }
 }
