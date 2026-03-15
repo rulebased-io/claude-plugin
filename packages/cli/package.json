@@ -1,6 +1,6 @@
 {
   "name": "@rulebased/cli",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Harness CLI - audit, init, recommend harness engineering setup for AI agents",
   "type": "module",
   "bin": {

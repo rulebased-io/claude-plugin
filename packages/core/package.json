@@ -1,6 +1,6 @@
 {
   "name": "@rulebased/core",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Harness auditor, recommender, initializer - core logic for AI agent harness engineering",
   "type": "module",
   "main": "dist/auditor.js",
