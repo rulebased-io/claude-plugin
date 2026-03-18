@@ -29,7 +29,7 @@ claude --plugin-dir ./packages/harness
 설치 후 사용 가능한 slash 커맨드:
 
 ```
-/rulebased:harness-audit      # 하네스 구축 정도 점검 (34개 체크, 0-100 점수)
+/rulebased:harness-audit      # 하네스 구축 정도 점검 (36개 체크, 0-100 점수)
 /rulebased:harness-score      # 카테고리별 상세 점수 리포트
 /rulebased:harness-init       # 하네스 구조 초기화
 /rulebased:harness-recommend  # 빠진 하네스 요소 추천
@@ -62,7 +62,7 @@ npx @rulebased/harness eval-log
 
 ### harness-audit
 
-[OpenAI Codex 하네스 기준](https://openai.com/index/unlocking-the-codex-harness/)에 따라 34개 항목을 검사하고 0-100 점수를 매깁니다.
+[OpenAI Codex 하네스 기준](https://openai.com/index/unlocking-the-codex-harness/)에 따라 36개 항목을 검사하고 0-100 점수를 매깁니다.
 
 **점검 카테고리:**
 
@@ -103,7 +103,7 @@ npx @rulebased/harness eval-log
 생성되는 파일: `AGENTS.md`, `CLAUDE.md`, `.harness.json`, `specs/`, `tasks/`, `.gitignore`
 
 **프리셋:**
-- `standard` (기본) — 34개 전체 체크 활성화
+- `standard` (기본) — 36개 전체 체크 활성화
 - `minimal` — 필수 체크만 (AGENTS.md + 빌드 명령어)
 
 `.harness.json`으로 커스터마이즈:

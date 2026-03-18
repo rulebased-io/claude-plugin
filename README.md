@@ -29,7 +29,7 @@ claude --plugin-dir ./packages/harness
 After installation, the following slash commands are available:
 
 ```
-/rulebased:harness-audit      # Audit harness coverage (34 checks, 0-100 score)
+/rulebased:harness-audit      # Audit harness coverage (36 checks, 0-100 score)
 /rulebased:harness-score      # Per-category detailed score report
 /rulebased:harness-init       # Initialize harness structure
 /rulebased:harness-recommend  # Recommend missing harness elements
@@ -62,7 +62,7 @@ npx @rulebased/harness eval-log
 
 ### harness-audit
 
-Audits how well your project's harness is set up. Checks 34 items based on [OpenAI Codex harness standards](https://openai.com/index/unlocking-the-codex-harness/) and assigns a score from 0 to 100.
+Audits how well your project's harness is set up. Checks 36 items based on [OpenAI Codex harness standards](https://openai.com/index/unlocking-the-codex-harness/) and assigns a score from 0 to 100.
 
 **Checklist categories:**
 
@@ -103,7 +103,7 @@ Initializes the harness structure for your project.
 Creates: `AGENTS.md`, `CLAUDE.md`, `.harness.json`, `specs/`, `tasks/`, `.gitignore`
 
 **Presets:**
-- `standard` (default) — all 34 checks enabled
+- `standard` (default) — all 36 checks enabled
 - `minimal` — essential checks only (AGENTS.md + build commands)
 
 Customize via `.harness.json`:
