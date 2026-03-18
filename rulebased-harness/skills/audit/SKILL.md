@@ -38,7 +38,7 @@ Score: 0-100 / Grades: A (90+), B (75+), C (60+), D (40+), F
 
 Check for the existence of the following files/directories in the project root:
 
-Refer to [checklist.md](./checklist.md) for the full checklist.
+Refer to the full checklist at `$CLAUDE_PLUGIN_PATH/reference/checklist.md`.
 
 You can also use the CLI:
 ```bash
