@@ -1,10 +1,9 @@
 ---
-description: Initialize harness structure — creates AGENTS.md, specs/, tasks/ based on 36-item criteria
+description: Initialize harness structure with reconciliation — creates AGENTS.md, specs/, tasks/ and migrates existing artifacts
 argument-hint: "[--preset minimal|standard] [--force]"
 ---
 
-Read and follow the skill documentation at `${CLAUDE_PLUGIN_PATH}/skills/init/SKILL.md`.
-Reference the audit criteria at `${CLAUDE_PLUGIN_PATH}/reference/index.md` for what to create.
+Read and follow the shared documentation at `${CLAUDE_PLUGIN_PATH}/docs/init.md`.
 
 `CLAUDE_PLUGIN_PATH` is the plugin root path provided by the UserPromptSubmit hook.
 
