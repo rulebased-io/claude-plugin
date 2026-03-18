@@ -16,7 +16,7 @@ created: 2026-03-18
 - **What**: AGENTS.md 파일 존재 여부
 - **Why**: 에이전트가 프로젝트를 이해하는 첫 진입점. 60,000+ 레포에서 채택된 오픈 스탠다드.
 - **How to Check**: 프로젝트 루트에 `AGENTS.md` 파일 존재 확인
-- **Fix**: `/rulebased:harness-init` 스킬로 생성하거나 수동 작성
+- **Fix**: `/rulebased-harness:init` 스킬로 생성하거나 수동 작성
 - **Reference**: [OpenAI — Custom instructions with AGENTS.md](https://developers.openai.com/codex/guides/agents-md)
 
 ---
@@ -86,5 +86,5 @@ created: 2026-03-18
 - **What**: CLAUDE.md 파일 존재 여부
 - **Why**: Claude Code가 프로젝트 진입 시 자동으로 읽는 파일. AGENTS.md로 라우팅하거나 Claude 특화 지시를 담음.
 - **How to Check**: 프로젝트 루트에 `CLAUDE.md` 파일 존재 확인
-- **Fix**: `/rulebased:harness-init` 스킬로 생성. 내용은 AGENTS.md 참조로 충분.
+- **Fix**: `/rulebased-harness:init` 스킬로 생성. 내용은 AGENTS.md 참조로 충분.
 - **Reference**: [Anthropic — Claude Code Documentation](https://code.claude.com/docs/en/overview)

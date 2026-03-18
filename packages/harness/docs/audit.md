@@ -67,4 +67,4 @@ Present results as a per-category breakdown. For each item show:
 
 End with: overall score, grade, and top 3 improvement recommendations.
 
-To auto-generate missing items, run `/rulebased:harness-recommend`.
+To auto-generate missing items, run `/rulebased-harness:recommend`.

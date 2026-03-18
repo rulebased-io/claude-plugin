@@ -10,7 +10,7 @@
   },
   "plugins": [
     {
-      "name": "harness",
+      "name": "rulebased-harness",
       "description": "Harness audit, score, init, recommend, and eval-log for AI agent projects",
       "source": "./packages/harness",
       "version": "1.4.2",

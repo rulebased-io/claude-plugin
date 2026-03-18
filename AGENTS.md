@@ -7,7 +7,7 @@
 **@rulebased/harness** - AI 에이전트를 위한 하네스 구축 도구.
 프로젝트의 하네스 구축 정도를 점검(audit), 빠진 요소를 추천(recommend), 하네스를 초기화(init)합니다.
 
-- 플러그인명: `rulebased` → `/rulebased:harness-init`, `/rulebased:harness-audit`, `/rulebased:harness-recommend`
+- 플러그인명: `rulebased-harness` → `/rulebased-harness:init`, `/rulebased-harness:audit`, `/rulebased-harness:recommend`
 - npm: `@rulebased/harness`
 - GitHub: `rulebased-io/claude-plugin`
 - 도메인: `rulebased.io`

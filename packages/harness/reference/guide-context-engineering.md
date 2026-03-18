@@ -145,7 +145,7 @@ import {Request} from "express"
 
 ## 개선 전략
 
-1. **즉시**: `/rulebased:harness-init` 스킬로 AGENTS.md 스캐폴딩 생성
+1. **즉시**: `/rulebased-harness:init` 스킬로 AGENTS.md 스캐폴딩 생성
 2. **단기**: 빌드 커맨드, 아키텍처 트리, 흔한 실수 섹션 채우기
 3. **중기**: 코딩 컨벤션에 코드 예시 추가, 금지 행동 목록 작성
 4. **장기**: 페르소나 정의, 주기적 AGENTS.md 갱신 워크플로우 구축

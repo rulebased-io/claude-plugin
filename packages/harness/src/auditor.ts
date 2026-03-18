@@ -62,7 +62,7 @@ function auditContext(p: string): AuditCheck[] {
     name: "AGENTS.md exists",
     description: "Primary agent instruction file at project root",
     pass: agentsExists, severity: "critical",
-    fix: "Create AGENTS.md. Use /rulebased:harness-init to auto-generate.",
+    fix: "Create AGENTS.md. Use /rulebased-harness:init to auto-generate.",
   });
 
   if (agentsExists) {

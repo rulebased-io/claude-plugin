@@ -17,7 +17,7 @@ AI 에이전트를 위한 하네스 구축 도구. 프로젝트의 하네스 엔
 /plugin marketplace add rulebased-io/claude-plugin
 
 # 2단계: 플러그인 설치
-/plugin install harness@rulebased
+/plugin install rulebased-harness@rulebased
 ```
 
 2. 또는 개발 중 로컬에서 테스트:
@@ -29,11 +29,11 @@ claude --plugin-dir ./packages/harness
 설치 후 사용 가능한 slash 커맨드:
 
 ```
-/rulebased:harness-audit      # 하네스 구축 정도 점검 (36개 체크, 0-100 점수)
-/rulebased:harness-score      # 카테고리별 상세 점수 리포트
-/rulebased:harness-init       # 하네스 구조 초기화
-/rulebased:harness-recommend  # 빠진 하네스 요소 추천
-/rulebased:harness-eval-log   # 대화 로그 부합도 평가
+/rulebased-harness:audit      # 하네스 구축 정도 점검 (36개 체크, 0-100 점수)
+/rulebased-harness:score      # 카테고리별 상세 점수 리포트
+/rulebased-harness:init       # 하네스 구조 초기화
+/rulebased-harness:recommend  # 빠진 하네스 요소 추천
+/rulebased-harness:eval-log   # 대화 로그 부합도 평가
 ```
 
 플러그인에는 **Stop hook**이 포함되어 있어, 10회 이상의 에이전트 턴이 있는 세션 종료 시 자동으로 부합도를 평가합니다.

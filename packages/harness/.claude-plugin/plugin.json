@@ -1,5 +1,5 @@
 {
-  "name": "harness",
+  "name": "rulebased-harness",
   "description": "Harness engineering tools for AI agents — audit, score, init, recommend, eval-log",
   "version": "1.4.2",
   "author": {

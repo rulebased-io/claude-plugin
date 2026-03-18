@@ -17,7 +17,7 @@ A harness-building tool for AI agents. Assess how well your project's harness en
 /plugin marketplace add rulebased-io/claude-plugin
 
 # Step 2: Install the plugin
-/plugin install harness@rulebased
+/plugin install rulebased-harness@rulebased
 ```
 
 2. Or test locally during development:
@@ -29,11 +29,11 @@ claude --plugin-dir ./packages/harness
 After installation, the following slash commands are available:
 
 ```
-/rulebased:harness-audit      # Audit harness coverage (36 checks, 0-100 score)
-/rulebased:harness-score      # Per-category detailed score report
-/rulebased:harness-init       # Initialize harness structure
-/rulebased:harness-recommend  # Recommend missing harness elements
-/rulebased:harness-eval-log   # Evaluate conversation log compliance
+/rulebased-harness:audit      # Audit harness coverage (36 checks, 0-100 score)
+/rulebased-harness:score      # Per-category detailed score report
+/rulebased-harness:init       # Initialize harness structure
+/rulebased-harness:recommend  # Recommend missing harness elements
+/rulebased-harness:eval-log   # Evaluate conversation log compliance
 ```
 
 The plugin also includes a **Stop hook** that automatically evaluates session compliance when a session with 10+ agent turns ends.
