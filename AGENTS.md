@@ -114,7 +114,27 @@ patch 단위(x.y.Z)로 올리고, 기능 추가 시 minor(x.Y.0).
 - 외부 자료를 **2차 가공**한 데이터(비교표, 분석, 체크리스트 도출 등)는 이 레포에 보관할 수 있다
 - 새로운 레퍼런스를 발견하면 `references/harness-engineering.md`에 추가한다
 
-### 7. 흔한 실수
+### 7. .md 문서 작성 시 frontmatter 활용 (자동 적용)
+
+**이 프로젝트에서 .md 파일을 생성·수정할 때 YAML frontmatter를 반드시 포함한다.**
+
+```yaml
+---
+name: 문서 이름
+description: 이 문서의 목적을 한 줄로 설명
+type: spec | reference | skill | agent | backlog
+created: YYYY-MM-DD
+---
+```
+
+- **모든 .md 파일**에 frontmatter를 작성한다 (README.md, AGENTS.md, CLAUDE.md 등 프로젝트 루트 문서는 제외)
+- `name`, `description`은 필수. 그 외 필드는 문서 유형에 따라 추가한다
+- 스킬(`skills/*/SKILL.md`)은 Claude Code 공식 스펙에 따라 `name`, `description` 필수
+- specs/backlog 문서: `type`, `created`, `priority` (high/medium/low)
+- references 문서: `type: reference`, `source` (출처 도메인)
+- frontmatter는 파서가 메타데이터로 활용할 수 있으므로, 본문에 중복 기재하지 않는다
+
+### 8. 흔한 실수
 
 1. ESM에서 `__dirname` 불가 → `fileURLToPath(import.meta.url)` 사용
 2. ts-jest에서 `import.meta.dirname` 미지원 → `fileURLToPath` 패턴 사용

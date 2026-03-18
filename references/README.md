@@ -1,3 +1,10 @@
+---
+name: references-index
+description: 외부 레퍼런스 디렉토리 안내 및 관리 규칙
+type: reference
+created: 2026-03-18
+---
+
 # References
 
 외부 하네스 엔지니어링 관련 공식 문서 및 블로그의 **링크 모음**.

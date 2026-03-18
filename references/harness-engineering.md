@@ -1,3 +1,10 @@
+---
+name: harness-engineering-references
+description: 외부 하네스 엔지니어링 공식 문서 및 블로그 링크 모음
+type: reference
+created: 2026-03-18
+---
+
 # Harness Engineering — 외부 레퍼런스 링크 모음
 
 > **규칙**: 원본 콘텐츠를 복사하여 보관하지 않는다. 링크와 요약만 저장한다.
