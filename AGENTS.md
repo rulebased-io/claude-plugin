@@ -154,10 +154,10 @@ rulebased-harness/
 └── agents/           ← 에이전트 전용 (독립 내용 가능)
 ```
 
-- `skills/*/SKILL.md`와 `commands/*.md`에는 **frontmatter + `$ARGUMENTS`만** 포함한다 (본문 없음)
-- 실제 기능 로직은 `docs/*.md`에 작성한다
-- skills/commands에 docs 참조 안내, 경로 힌트 등 불필요한 내용을 넣지 않는다
-- `docs/*.md`를 수정하면 skills와 commands의 동작이 동시에 변경된다
+- `skills/*/SKILL.md`와 `commands/*.md`에는 **각 명령에 필요한 지시문을 직접 넣는다**
+- `docs/*.md`는 개발자가 참조하는 원본이다. 플러그인 런타임에서 docs/에 접근할 수 없으므로, skills/commands가 docs/를 참조하게 만들지 않는다
+- skills/commands의 내용을 변경할 때는 `docs/*.md` 원본을 먼저 수정하고, 그 내용을 skills/commands에 반영한다
+- skills와 commands는 동일한 docs/ 원본에서 파생되므로 내용이 동일해야 한다 (frontmatter만 다름)
 - **agents만 예외**: agents는 자율 작업 특성상 독립된 내용을 가질 수 있다
 
 ### 9. 플러그인 평가 기준 데이터 원칙 (자동 적용)
