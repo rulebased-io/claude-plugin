@@ -19,21 +19,29 @@ Read the scaffold directory at `${CLAUDE_PLUGIN_PATH}/scaffold/` and recreate th
 ├── CLAUDE.md             # AGENTS.md, rules.md 참조
 ├── system/               # 규칙, 스키마, 용어집, 템플릿
 │   ├── rules.md
+│   ├── standard-schema.md  # Transit/Storage Schema 정의
 │   ├── design-principles.md
 │   ├── glossary.md
 │   ├── MOC-index.md
 │   └── templates/        # note, idea, journal, snippet, til
 ├── inbox/                # 빠른 캡처, 외부 유입
+│   └── README.md         # inbox 운영 가이드
 ├── workspace/            # 직접 작업 공통 루트
+│   ├── README.md         # workspace 구조 가이드
 │   ├── notes/            # fleeting, literature
 │   ├── code/             # snippets, til
 │   ├── projects/
 │   └── resources/
 ├── ideas/                # 아이디어 스테이징 (seed→growing→ripe)
+│   └── README.md         # 아이디어 생명주기 가이드
 ├── journal/              # 일기, 회고
 ├── areas/                # 지속 관리 영역
+│   └── profile.md        # 개인 프로필 템플릿
 ├── archives/             # 비활성 보관
 └── brains/               # Permission Set 템플릿
+    ├── README.md         # Permission Set 운영 가이드
+    ├── mentor-session/   # 멘토링 세션 Permission Set
+    └── project-collab/   # 프로젝트 협업 Permission Set
 ```
 
 **절차**:

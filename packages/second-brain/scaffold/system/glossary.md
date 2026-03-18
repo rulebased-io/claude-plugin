@@ -3,7 +3,7 @@ title: 용어집
 date: {{DATE}}
 tags: [glossary, reference]
 type: permanent
-related: [[rules]], [[design-principles]]
+related: [[rules]], [[design-principles]], [[standard-schema]]
 ---
 
 # 용어집
@@ -12,21 +12,101 @@ related: [[rules]], [[design-principles]]
 
 ---
 
+## A
+
+### Areas (영역)
+지속적으로 관리하는 책임 영역. 프로젝트와 달리 완료 시점이 없다. 예: 건강, 재정, 커리어. `areas/` 디렉토리에 저장.
+
+### Archives (아카이브)
+비활성화된 프로젝트, 더 이상 관련 없는 노트의 보관소. `archives/` 디렉토리.
+
+---
+
+## B
+
+### BRAIN.md
+외부 에이전트가 이 세컨드 브레인에 연결할 때 가장 먼저 읽는 파일. 소유자 정보, 접근 정책, Permission Set 목록을 포함.
+
+---
+
+## C
+
+### CODE (Capture → Organize → Distill → Express)
+Tiago Forte의 세컨드 브레인 워크플로우. 캡처하고, 정리하고, 핵심을 추출하고, 결과물을 만드는 4단계.
+
+---
+
 ## F
 
+### Federation (연합)
+외부 에이전트가 BRAIN.md를 통해 세컨드 브레인에 접근하는 구조. Permission Set으로 접근 범위를 제어.
+
+### fleeting note (일시 노트)
+빠르게 적은 임시 메모. 나중에 permanent note로 발전시키거나 삭제. `workspace/notes/fleeting/`.
+
 ### frontmatter
-Markdown 파일 상단의 YAML 메타데이터 블록. `---`으로 감싼다.
+Markdown 파일 상단의 YAML 메타데이터 블록. `---`으로 감싼다. Storage Schema의 핵심.
+
+---
+
+## I
+
+### Idea Emergence (아이디어 부상)
+아이디어가 seed → growing → ripe → project로 발전하는 과정. `ideas/` 디렉토리에서 추적.
+
+---
+
+## L
+
+### literature note (문헌 노트)
+외부 자료(책, 글, 영상)에서 추출한 노트. 자신의 말로 재구성하며, `source` 필드 필수. `workspace/notes/literature/`.
 
 ---
 
 ## M
 
 ### MOC (Map of Content)
-여러 노트를 연결하는 인덱스 노트. 특정 주제의 지도 역할.
+여러 노트를 연결하는 인덱스 노트. 특정 주제의 지도 역할. 3개 이상 관련 노트가 모이면 생성 고려.
+
+---
+
+## P
+
+### PARA (Projects / Areas / Resources / Archives)
+Tiago Forte의 정보 조직 프레임워크. 실행 가능성을 기준으로 정보를 4단계로 분류.
+
+### Permission Set (권한 세트)
+외부 에이전트에게 열어줄 경로와 행동 범위를 정의하는 템플릿. `brains/` 디렉토리에 저장.
+
+### permanent note (영구 노트)
+정제된 핵심 지식. 원자성(1노트=1아이디어)과 자립성(맥락 없이 이해 가능)을 갖춤.
+
+### Progressive Summarization (점진적 요약)
+노트를 단계적으로 압축하는 기법. 원문 → 볼드 → 하이라이트 → 핵심 요약. Distill 단계의 핵심 기법.
 
 ---
 
 ## S
 
+### SKILL
+세컨드 브레인의 기능 단위. capture, connect, review 등. Claude 플러그인 스킬이 SKILL을 실행.
+
 ### SSOT (Single Source of Truth)
 하나의 진실 원본. 이 세컨드 브레인에서는 `.md` 파일이 SSOT다.
+
+### Storage Schema
+`.md` 파일의 frontmatter 형식 정의. 모든 도구가 이 스키마를 따른다. `standard-schema.md` 참조.
+
+---
+
+## T
+
+### Transit Schema
+SKILL이나 외부 에이전트가 노트를 생성·수정할 때 사용하는 중간 표현 형식. Storage Schema와 변환 규칙이 정의되어 있다.
+
+---
+
+## W
+
+### wiki-link
+`[[파일명]]` 형식의 내부 링크. 노트 간 연결의 기본 단위. 확장자를 제외하고 파일명만 사용.
