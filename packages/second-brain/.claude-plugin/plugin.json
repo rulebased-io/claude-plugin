@@ -1,0 +1,11 @@
+{
+  "name": "second-brain",
+  "description": "Second brain tools for Claude Code — capture, connect, review, organize, synthesize, search, daily, refactor",
+  "version": "0.1.0",
+  "author": {
+    "name": "rulebased.io"
+  },
+  "homepage": "https://rulebased.io",
+  "repository": "https://github.com/rulebased-io/claude-plugin",
+  "license": "MIT"
+}
