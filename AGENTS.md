@@ -154,10 +154,11 @@ rulebased-harness/
 └── agents/           ← 에이전트 전용 (독립 내용 가능)
 ```
 
-- 기능 로직을 수정할 때 `docs/*.md`만 수정하면 skills와 commands에 동시 반영된다
-- `skills/*/SKILL.md`와 `commands/*.md`에는 frontmatter + `docs/*.md` 링크 + `$ARGUMENTS`만 포함한다
-- **agents만 예외**: agents는 자율 작업 특성상 독립된 내용을 가질 수 있다 (서브에이전트 위임 등)
-- 향후 agents에만 적용할 차이가 있을 때 agents 정의 파일만 별도로 수정한다
+- `skills/*/SKILL.md`와 `commands/*.md`에는 **frontmatter + `$ARGUMENTS`만** 포함한다 (본문 없음)
+- 실제 기능 로직은 `docs/*.md`에 작성한다
+- skills/commands에 docs 참조 안내, 경로 힌트 등 불필요한 내용을 넣지 않는다
+- `docs/*.md`를 수정하면 skills와 commands의 동작이 동시에 변경된다
+- **agents만 예외**: agents는 자율 작업 특성상 독립된 내용을 가질 수 있다
 
 ### 9. 플러그인 평가 기준 데이터 원칙 (자동 적용)
 
