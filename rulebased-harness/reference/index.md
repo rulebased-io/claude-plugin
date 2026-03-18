@@ -34,14 +34,27 @@ index.md (이 파일)  →  guide-*.md (평가 가이드)  →  *.md (항목 정
 
 **만점**: 57점
 
+### 3단계 평가
+
+각 항목은 3단계로 평가한다:
+
+| 상태 | 의미 | 점수 비율 |
+|------|------|-----------|
+| **pass** | 구조 존재 + 실제 콘텐츠 있음 | weight × 100% |
+| **hollow** | 구조 존재하나 비어 있거나 플레이스홀더만 있음 | weight × 50% |
+| **fail** | 구조 자체가 없음 | 0 |
+
+hollow 상태가 적용되는 항목은 Summary Table의 `H` 열에 `✓`로 표시.
+hollow가 적용되지 않는 항목(설정 파일, boolean 판정)은 pass/fail만 사용.
+
 ### 점수 공식
 
 ```
-score = (통과한 항목의 weight 합계 / 전체 항목의 weight 합계) × 100
+score = (pass_weight_합 + hollow_weight_합 × 0.5) / 전체_weight_합 × 100
 ```
 
-예시: critical 4개 중 3개 통과(9), important 11개 중 8개 통과(16), nice-to-have 21개 중 10개 통과(10)
-→ `(9 + 16 + 10) / 57 × 100 = 61.4` → **C등급**
+예시: critical 4개 중 3개 pass(9) + 1개 hollow(1.5), important 8개 pass(16) + 2개 hollow(2), nice-to-have 10개 pass(10)
+→ `(9 + 1.5 + 16 + 2 + 10) / 57 × 100 = 67.5` → **C등급**
 
 ### 등급
 
@@ -73,41 +86,43 @@ score = (통과한 항목의 weight 합계 / 전체 항목의 weight 합계) × 
 
 ## Summary Table
 
-| ID | Item | Severity | Category |
-|----|------|----------|----------|
-| ctx-agents-exists | AGENTS.md exists | critical | Context Engineering |
-| ctx-agents-build | Build commands in AGENTS.md | critical | Context Engineering |
-| ctx-agents-arch | Architecture description | important | Context Engineering |
-| ctx-agents-pitfalls | Common pitfalls | important | Context Engineering |
-| ctx-agents-conventions | Coding conventions | important | Context Engineering |
-| ctx-agents-persona | Agent persona/role | nice-to-have | Context Engineering |
-| ctx-agents-boundaries | Boundaries/restrictions | important | Context Engineering |
-| ctx-claude-exists | CLAUDE.md exists | important | Context Engineering |
-| wf-specs-dir | specs directory | nice-to-have | Workflow |
-| wf-tasks-dir | tasks directory | nice-to-have | Workflow |
-| wf-backlog | backlog directory | nice-to-have | Workflow |
-| wf-spec-template | spec template | nice-to-have | Workflow |
-| wf-done-archive | done archive structure | nice-to-have | Workflow |
-| cst-lint | Linter/formatter | important | Constraints |
-| cst-precommit | Pre-commit hook | nice-to-have | Constraints |
-| cst-type-safety | Type safety (strict mode) | important | Constraints |
-| cst-editorconfig | .editorconfig | nice-to-have | Constraints |
-| cst-commit-convention | Commit message convention | nice-to-have | Constraints |
-| eval-dir | Eval dataset | nice-to-have | Eval |
-| eval-log-config | Session log evaluation | nice-to-have | Eval |
-| eval-autonomy-metric | Autonomy metric defined | nice-to-have | Eval |
-| eval-quality-gate | Quality gate (CI pass) | important | Eval |
-| build-test-script | Test script | critical | Build & Test |
-| build-build-script | Build script | important | Build & Test |
-| build-ci | CI/CD configuration | nice-to-have | Build & Test |
-| build-lockfile | Package lock file | nice-to-have | Build & Test |
-| docs-readme | README.md | important | Documentation |
-| docs-gitignore | .gitignore | important | Documentation |
-| docs-license | LICENSE file | nice-to-have | Documentation |
-| docs-changelog | CHANGELOG or release notes | nice-to-have | Documentation |
-| sec-no-secrets | Secrets excluded from repo | critical | Security |
-| sec-gitignore-patterns | Sensitive file patterns blocked | important | Security |
-| sec-dependency-audit | Dependency audit configured | nice-to-have | Security |
-| auto-context-completeness | Context completeness | important | Agent Autonomy |
-| auto-tool-config | MCP/Agent Skills configured | nice-to-have | Agent Autonomy |
-| auto-memory-system | Persistent memory system | nice-to-have | Agent Autonomy |
+`H` 열: hollow 상태 적용 가능 여부. ✓ 항목은 "구조는 있으나 비어 있음"을 감지하여 50% 점수를 부여한다.
+
+| ID | Item | Severity | Category | H | Hollow 판정 기준 |
+|----|------|----------|----------|---|-------------------|
+| ctx-agents-exists | AGENTS.md exists | critical | Context Engineering | ✓ | 파일 존재하나 TODO만 있거나 10줄 미만 |
+| ctx-agents-build | Build commands in AGENTS.md | critical | Context Engineering | ✓ | 섹션 존재하나 실제 커맨드 없음 |
+| ctx-agents-arch | Architecture description | important | Context Engineering | ✓ | 섹션 존재하나 디렉토리 트리/설명 없음 |
+| ctx-agents-pitfalls | Common pitfalls | important | Context Engineering | ✓ | 섹션 존재하나 항목 0개 |
+| ctx-agents-conventions | Coding conventions | important | Context Engineering | ✓ | 섹션 존재하나 구체적 규칙/예시 없음 |
+| ctx-agents-persona | Agent persona/role | nice-to-have | Context Engineering | | |
+| ctx-agents-boundaries | Boundaries/restrictions | important | Context Engineering | ✓ | 섹션 존재하나 항목 0개 |
+| ctx-claude-exists | CLAUDE.md exists | important | Context Engineering | ✓ | 파일 존재하나 3줄 미만 또는 빈 내용 |
+| wf-specs-dir | specs directory | nice-to-have | Workflow | ✓ | 디렉토리 존재하나 .md 파일 0개 |
+| wf-tasks-dir | tasks directory | nice-to-have | Workflow | ✓ | 디렉토리 존재하나 .md 파일 0개 |
+| wf-backlog | backlog directory | nice-to-have | Workflow | ✓ | 디렉토리 존재하나 .md 파일 0개 |
+| wf-spec-template | spec template | nice-to-have | Workflow | | |
+| wf-done-archive | done archive structure | nice-to-have | Workflow | ✓ | 디렉토리 존재하나 .md 파일 0개 |
+| cst-lint | Linter/formatter | important | Constraints | | |
+| cst-precommit | Pre-commit hook | nice-to-have | Constraints | | |
+| cst-type-safety | Type safety (strict mode) | important | Constraints | | |
+| cst-editorconfig | .editorconfig | nice-to-have | Constraints | | |
+| cst-commit-convention | Commit message convention | nice-to-have | Constraints | | |
+| eval-dir | Eval dataset | nice-to-have | Eval | ✓ | 디렉토리 존재하나 eval 파일 0개 |
+| eval-log-config | Session log evaluation | nice-to-have | Eval | | |
+| eval-autonomy-metric | Autonomy metric defined | nice-to-have | Eval | | |
+| eval-quality-gate | Quality gate (CI pass) | important | Eval | | |
+| build-test-script | Test script | critical | Build & Test | | |
+| build-build-script | Build script | important | Build & Test | | |
+| build-ci | CI/CD configuration | nice-to-have | Build & Test | | |
+| build-lockfile | Package lock file | nice-to-have | Build & Test | | |
+| docs-readme | README.md | important | Documentation | ✓ | 파일 존재하나 5줄 미만 또는 제목만 |
+| docs-gitignore | .gitignore | important | Documentation | | |
+| docs-license | LICENSE file | nice-to-have | Documentation | | |
+| docs-changelog | CHANGELOG or release notes | nice-to-have | Documentation | ✓ | 파일 존재하나 엔트리 0개 |
+| sec-no-secrets | Secrets excluded from repo | critical | Security | | |
+| sec-gitignore-patterns | Sensitive file patterns blocked | important | Security | | |
+| sec-dependency-audit | Dependency audit configured | nice-to-have | Security | | |
+| auto-context-completeness | Context completeness | important | Agent Autonomy | | |
+| auto-tool-config | MCP/Agent Skills configured | nice-to-have | Agent Autonomy | | |
+| auto-memory-system | Persistent memory system | nice-to-have | Agent Autonomy | | |

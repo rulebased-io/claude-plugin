@@ -1,6 +1,6 @@
 {
   "name": "@rulebased/harness",
-  "version": "1.3.16",
+  "version": "1.4.0",
   "private": true,
   "description": "Harness engineering tools for AI agents — audit, init, recommend your project's agent-readiness",
   "keywords": [
