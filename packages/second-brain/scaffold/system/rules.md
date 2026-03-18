@@ -34,7 +34,7 @@ related: [[design-principles]], [[glossary]], [[standard-schema]]
 
 ## 2. 스키마 규칙
 
-모든 노트는 `system/standard-schema.md`에 정의된 Storage Schema를 따른다.
+모든 콘텐츠는 `system/standard-schema.md`에 정의된 Storage Schema를 따른다.
 
 ### frontmatter 기본 형식
 ```yaml
@@ -42,7 +42,7 @@ related: [[design-principles]], [[glossary]], [[standard-schema]]
 title: string
 date: YYYY-MM-DD
 tags: string[]
-type: fleeting | literature | permanent | idea | journal | snippet | til
+type: memo | reading | knowledge | idea | journal | snippet | til
 source: string          # 선택
 related: wikilink[]     # 선택
 ---
@@ -59,11 +59,14 @@ related: wikilink[]     # 선택
 | 유형 | 위치 | 설명 |
 |------|------|------|
 | 외부 유입·자동 캡처 | `inbox/` | 정리 전 임시 저장. 7일 내 분류 |
-| 직접 작업 (노트, 프로젝트, 코드) | `workspace/` | 능동적으로 만드는 모든 것 |
+| 지식·학습 정리 | `workspace/knowledge/` | 메모, 읽기 정리, 정제된 지식 |
+| 코드·기술 | `workspace/code/` | 스니펫, TIL |
+| 프로젝트 | `workspace/projects/` | 활성 프로젝트별 공간 |
+| 참고 자료 | `workspace/resources/` | 범용 레퍼런스 |
 | 아이디어 | `ideas/` | seed→growing→ripe 생명주기 |
 | 일상 회고 | `journal/` | 일기, 감정, 에너지 기록 |
 | 지속 관리 영역 | `areas/` | 역할, 건강, 재정 등 상시 관심사 |
-| 비활성 보관 | `archives/` | 완료·폐기된 프로젝트와 노트 |
+| 비활성 보관 | `archives/` | 완료·폐기된 프로젝트와 자료 |
 
 ---
 
@@ -76,23 +79,23 @@ related: wikilink[]     # 선택
 
 ---
 
-## 5. 노트 품질 규칙 (Zettelkasten)
+## 5. 콘텐츠 품질 규칙
 
 ### 원자성
-- 노트 하나에 아이디어 하나
-- 너무 길면 쪼갠다. 너무 짧으면 합칠 필요는 없다
+- 하나의 파일에 하나의 주제
+- 너무 길면 쪼갠다
 
 ### 자립성
 - 맥락 없이도 이해 가능한 완전한 문장으로 작성
 - "위 내용 참고" 같은 암시적 참조 금지
 
 ### 연결성
-- 관련 노트가 있으면 `[[wiki-link]]`로 연결
-- permanent 노트는 최소 1개 이상 연결 권장
+- 관련 항목이 있으면 `[[wiki-link]]`로 연결
+- knowledge 타입은 최소 1개 이상 연결 권장
 - 3개 이상 연결된 클러스터 → MOC 생성 고려
 
-### Progressive Summarization (Distill)
-- 문헌 노트는 핵심 아이디어를 자신의 말로 요약
+### 핵심 추출 (Distill)
+- 읽기 정리(reading)는 핵심을 자신의 말로 요약
 - **볼드**로 핵심 문장 표시 → 나중에 빠르게 스캔 가능
 - `## 핵심 아이디어` 섹션으로 1-3줄 요약 추가
 
@@ -103,9 +106,9 @@ related: wikilink[]     # 선택
 > SKILL = 세컨드 브레인의 기능 단위. Claude 플러그인 스킬이 SKILL을 실행한다.
 
 ### 추상화 경계
-- **SKILL 쪽**: 노트 생성·수정·검색·연결 로직
+- **SKILL 쪽**: 콘텐츠 생성·수정·검색·연결 로직
 - **클라이언트 쪽**: UI, 동기화, 렌더링
-- SKILL은 Transit Schema로 노트를 전달하고, 클라이언트가 Storage Schema로 저장
+- SKILL은 Transit Schema로 데이터를 전달하고, 클라이언트가 Storage Schema로 저장
 
 ### SKILL이 지켜야 할 것
 - 항상 `standard-schema.md`의 스키마를 따른다
@@ -129,8 +132,8 @@ related: wikilink[]     # 선택
 
 - 날카롭게 응답한다. 동조 전에 빠진 것, 모순, 위험 요소를 먼저 짚는다
 - 파일 이동/삭제: 반드시 사용자에게 먼저 확인
-- 기존 노트를 수정할 때는 반드시 먼저 읽고 파악한 뒤 수정
-- 노트 생성 시 템플릿(`system/templates/`)을 기반으로 작성
+- 기존 파일을 수정할 때는 반드시 먼저 읽고 파악한 뒤 수정
+- 새 파일 생성 시 템플릿(`system/templates/`)을 기반으로 작성
 - `{{OWNER_NAME}}`을 실제 이름으로 치환하지 않은 파일이 있으면 경고
 - 검색 시 frontmatter → 파일명 → 본문 순서로 탐색
 
@@ -141,12 +144,12 @@ related: wikilink[]     # 선택
 ### 폴더·파일명
 - 영문 소문자 + 하이픈 (`my-project`, `design-thinking`)
 - 한글 폴더명 금지 (이식성)
-- 깊이 2단계 제한 (`workspace/notes/` ← OK, `workspace/notes/sub/deep/` ← 지양)
+- 깊이 2단계 제한 (`workspace/knowledge/` ← OK, `workspace/knowledge/sub/deep/` ← 지양)
 
 ### 태그
 - 소문자, 하이픈 구분 (`#machine-learning`, `#side-project`)
 - 계층 태그 허용 (`#dev/frontend`, `#reading/book`)
-- 태그 수: 노트당 2~5개 권장
+- 태그 수: 파일당 2~5개 권장
 
 ### wiki-link
 - `[[파일명]]` 형식 (확장자 제외)

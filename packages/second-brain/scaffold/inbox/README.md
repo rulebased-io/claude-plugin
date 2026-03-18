@@ -26,14 +26,14 @@ inbox/에 도착
     ↓
 내용 확인
     ↓
-┌─────────────────────────────┐
-│ 아이디어?     → ideas/      │
-│ 학습 노트?    → workspace/  │
-│ 일상 기록?    → journal/    │
-│ 코드 조각?    → workspace/code/ │
-│ 쓸모없음?     → 삭제        │
-│ 나중에 볼 것? → workspace/resources/ │
-└─────────────────────────────┘
+┌─────────────────────────────────────┐
+│ 아이디어?      → ideas/             │
+│ 학습할 내용?   → workspace/knowledge/ │
+│ 일상 기록?     → journal/           │
+│ 코드 조각?     → workspace/code/    │
+│ 쓸모없음?      → 삭제               │
+│ 나중에 볼 것?  → workspace/resources/ │
+└─────────────────────────────────────┘
 ```
 
 ---
@@ -60,6 +60,6 @@ frontmatter 최소:
 title: 간단한 설명
 date: YYYY-MM-DD
 tags: [inbox]
-type: fleeting
+type: memo
 ---
 ```

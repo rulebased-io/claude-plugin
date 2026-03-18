@@ -30,7 +30,7 @@ Read the scaffold directory at `${CLAUDE_PLUGIN_PATH}/scaffold/` and recreate th
 │   └── README.md         # inbox 운영 가이드
 ├── workspace/            # 직접 작업 공통 루트
 │   ├── README.md         # workspace 구조 가이드
-│   ├── notes/            # fleeting, literature
+│   ├── knowledge/        # memos, readings
 │   ├── code/             # snippets, til
 │   ├── projects/
 │   └── resources/
@@ -59,13 +59,13 @@ Read the scaffold directory at `${CLAUDE_PLUGIN_PATH}/scaffold/` and recreate th
 
 **탐색 대상**:
 - `notes/`, `daily/`, `maps/` — 기존 second-brain 스킬 스펙 구조
-- `*.md` 파일 (루트) — 기존 노트
+- `*.md` 파일 (루트) — 기존 파일
 - `templates/` — 기존 템플릿
 
 **절차**:
 1. 발견된 파일 목록을 사용자에게 보여준다
 2. 기존 구조와 새 구조의 매핑을 제안한다:
-   - `notes/` → `workspace/notes/`
+   - `notes/` → `workspace/knowledge/`
    - `daily/` → `journal/`
    - `maps/` → `system/` (MOC)
    - `inbox/` → `inbox/` (유지)

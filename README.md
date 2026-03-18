@@ -1,10 +1,26 @@
-# @rulebased/harness
+# Claude Code Plugins by rulebased.io
+
+Claude Code plugins for harness engineering and personal knowledge management.
+
+[한국어](README.ko.md)
+
+---
+
+## Plugins
+
+### @rulebased/harness
 
 A harness-building tool for AI agents. Assess how well your project's harness engineering is set up, get recommendations for missing elements, and auto-generate them.
 
 > **Harness Engineering** = A system design approach that constrains agent behavior (Constraints), provides context (Context), and evaluates results (Eval). See [OpenAI Harness Engineering](https://openai.com/index/harness-engineering/).
 
-[한국어](README.ko.md)
+### @rulebased/second-brain
+
+A personal knowledge management tool. Initialize a structured second brain, capture ideas, connect knowledge, review and organize your thinking — all from Claude Code.
+
+> Based on PKM methodologies: PARA, CODE (Capture→Organize→Distill→Express), Zettelkasten, MOC, and Spaced Repetition.
+
+---
 
 ## Installation
 
@@ -16,15 +32,41 @@ A harness-building tool for AI agents. Assess how well your project's harness en
 # Step 1: Add marketplace (inside Claude Code)
 /plugin marketplace add rulebased-io/claude-plugin
 
-# Step 2: Install the plugin
+# Step 2: Install a plugin
 /plugin install rulebased-harness@rulebased
+/plugin install rulebased-second-brain@rulebased
 ```
 
 2. Or test locally during development:
 
 ```bash
 claude --plugin-dir ./packages/harness
+claude --plugin-dir ./packages/second-brain
 ```
+
+### skills.sh
+
+```bash
+# Install all skills
+npx skills add rulebased-io/claude-plugin
+
+# Install a specific skill only
+npx skills add rulebased-io/claude-plugin --skill harness-audit
+```
+
+### CLI (npm) — harness only
+
+```bash
+npx @rulebased/harness audit
+npx @rulebased/harness score
+npx @rulebased/harness init
+npx @rulebased/harness recommend
+npx @rulebased/harness eval-log
+```
+
+---
+
+## Harness Skills
 
 After installation, the following slash commands are available:
 
@@ -37,28 +79,6 @@ After installation, the following slash commands are available:
 ```
 
 The plugin also includes a **Stop hook** that automatically evaluates session compliance when a session with 10+ agent turns ends.
-
-### skills.sh
-
-```bash
-# Install all skills
-npx skills add rulebased-io/claude-plugin
-
-# Install a specific skill only
-npx skills add rulebased-io/claude-plugin --skill harness-audit
-```
-
-### CLI (npm)
-
-```bash
-npx @rulebased/harness audit
-npx @rulebased/harness score
-npx @rulebased/harness init
-npx @rulebased/harness recommend
-npx @rulebased/harness eval-log
-```
-
-## Skills
 
 ### harness-audit
 
@@ -80,21 +100,6 @@ Audits how well your project's harness is set up. Checks 36 items based on [Open
 ### harness-score
 
 Per-category detailed score report. Shows how well each harness area is implemented.
-
-```
-## Harness Score Report
-
-[################----]  **81/100 (B)**
-
-### Context Engineering  [####################]  100/100  (9/9)
-- [PASS] AGENTS.md exists
-- [PASS] AGENTS.md includes build/test commands
-...
-
-### Constraints  [--------------------]  0/100  (0/2)
-- [FAIL] Linter configuration exists
-  -> Add ESLint, Biome, ruff, or equivalent linter config.
-```
 
 ### harness-init
 
@@ -131,20 +136,85 @@ Evaluates a Claude Code conversation transcript against harness compliance.
 
 **Auto-trigger:** Runs automatically via Stop hook when a session with 10+ agent turns ends.
 
+---
+
+## Second Brain Skills
+
+```
+/rulebased-second-brain:init        # Initialize second brain structure
+/rulebased-second-brain:capture     # Quick capture to inbox
+/rulebased-second-brain:connect     # Find and link related knowledge
+/rulebased-second-brain:review      # Spaced repetition review
+/rulebased-second-brain:organize    # Classify and move content
+/rulebased-second-brain:synthesize  # Generate insights from connections
+/rulebased-second-brain:search      # Search across the brain
+/rulebased-second-brain:daily       # Daily journal entry
+/rulebased-second-brain:refactor    # Restructure and clean up
+```
+
+### second-brain-init
+
+Scaffolds a complete second brain structure with:
+
+```
+<brain-root>/
+├── BRAIN.md              # External agent access policy
+├── AGENTS.md             # Agent roles and workflows
+├── system/               # Rules, schema, glossary, templates
+├── inbox/                # Quick capture (CODE: Capture)
+├── workspace/            # Active work
+│   ├── knowledge/        # Memos, readings, refined knowledge
+│   ├── code/             # Snippets, TIL
+│   ├── projects/         # Active projects
+│   └── resources/        # Reference materials
+├── ideas/                # Idea staging (seed→growing→ripe)
+├── journal/              # Daily reflection
+├── areas/                # Ongoing life areas (PARA)
+├── archives/             # Inactive storage
+└── brains/               # Permission sets for external agents
+```
+
+### Other second-brain skills
+
+- **capture** — Quick capture to inbox with minimal friction
+- **connect** — Find related items and create wiki-links
+- **review** — Spaced repetition review of knowledge
+- **organize** — Classify inbox items, move to proper locations
+- **synthesize** — Generate insights from connected knowledge
+- **search** — Full-text and tag-based search
+- **daily** — Create or continue today's journal entry
+- **refactor** — Restructure, merge, or split content
+
+---
+
+## Scoring System (Harness)
+
+| Severity | Weight | Examples |
+|----------|--------|----------|
+| Critical | 3 | AGENTS.md exists, build/test/lint commands, CI pipeline, .gitignore |
+| Important | 2 | Architecture description, linter, formatter, pre-commit, lockfile, ADRs |
+| Nice-to-have | 1 | Workflow directories, eval dataset, security docs, tech debt tracker |
+
+Grades: A (90+), B (75+), C (60+), D (40+), F
+
 ## Project Structure
 
 ```
-@rulebased/harness (pnpm monorepo)
+rulebased-plugin (pnpm monorepo)
 ├── packages/
-│   └── harness/                 # @rulebased/harness - plugin + core + CLI
-│       ├── skills/              # Skills (skills.sh + Claude Code)
+│   ├── harness/                 # @rulebased/harness - audit, init, recommend, eval
+│   │   ├── skills/              # Skills (skills.sh + Claude Code)
+│   │   ├── commands/            # Claude Code commands
+│   │   ├── agents/              # Autonomous agents
+│   │   ├── hooks/               # Plugin hooks
+│   │   ├── reference/           # Evaluation criteria
+│   │   ├── src/                 # Auditor, recommender, initializer, CLI
+│   │   └── tests/               # Tests + fixtures
+│   └── second-brain/            # @rulebased/second-brain - PKM tools
+│       ├── skills/              # 9 skills (init, capture, connect, ...)
 │       ├── commands/            # Claude Code commands
-│       ├── agents/              # Autonomous agents
-│       ├── hooks/               # Plugin hooks
-│       ├── reference/           # Evaluation criteria
-│       ├── docs/                # Shared docs (skills/commands)
-│       ├── src/                 # Auditor, recommender, initializer, CLI
-│       └── tests/               # Tests + fixtures
+│       ├── scaffold/            # Init templates and structure
+│       └── docs/                # Shared documentation
 ├── specs/                       # Spec workflow (todo/done/backlog)
 ├── tasks/                       # Task workflow (todo/done)
 └── docs/                        # Documentation
@@ -158,16 +228,6 @@ pnpm build
 pnpm test          # 26 tests
 ```
 
-## Scoring System
-
-| Severity | Weight | Examples |
-|----------|--------|----------|
-| Critical | 3 | AGENTS.md exists, build/test/lint commands, CI pipeline, .gitignore |
-| Important | 2 | Architecture description, linter, formatter, pre-commit, lockfile, ADRs |
-| Nice-to-have | 1 | Workflow directories, eval dataset, security docs, tech debt tracker |
-
-Grades: A (90+), B (75+), C (60+), D (40+), F
-
 ## Roadmap
 
 - [x] npm publish — `@rulebased/harness`
@@ -175,6 +235,7 @@ Grades: A (90+), B (75+), C (60+), D (40+), F
 - [ ] Built-in templates — per-project-type AGENTS.md, hooks, and audit presets
 - [ ] Harness import — bring harness setup from another project, diff and apply
 - [ ] Multi-agent plugins — Codex, Cursor support
+- [ ] npm publish — `@rulebased/second-brain`
 
 ## License
 

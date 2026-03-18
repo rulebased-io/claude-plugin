@@ -1,10 +1,26 @@
-# @rulebased/harness
+# Claude Code Plugins by rulebased.io
+
+하네스 엔지니어링과 개인 지식 관리를 위한 Claude Code 플러그인.
+
+[English](README.md)
+
+---
+
+## 플러그인
+
+### @rulebased/harness
 
 AI 에이전트를 위한 하네스 구축 도구. 프로젝트의 하네스 엔지니어링 구축 정도를 평가하고, 빠진 요소를 추천하고, 자동으로 생성합니다.
 
 > **하네스 엔지니어링** = 에이전트의 행동을 제약(Constraints)하고, 컨텍스트(Context)를 제공하고, 결과를 평가(Eval)하는 시스템 설계. [OpenAI Harness Engineering](https://openai.com/index/harness-engineering/) 참고.
 
-[English](README.md)
+### @rulebased/second-brain
+
+개인 지식 관리 도구. 구조화된 세컨드 브레인을 초기화하고, 아이디어를 캡처하고, 지식을 연결하고, 리뷰·정리하는 것을 Claude Code에서 수행합니다.
+
+> PKM 방법론 기반: PARA, CODE (Capture→Organize→Distill→Express), Zettelkasten, MOC, Spaced Repetition.
+
+---
 
 ## 설치
 
@@ -18,13 +34,39 @@ AI 에이전트를 위한 하네스 구축 도구. 프로젝트의 하네스 엔
 
 # 2단계: 플러그인 설치
 /plugin install rulebased-harness@rulebased
+/plugin install rulebased-second-brain@rulebased
 ```
 
 2. 또는 개발 중 로컬에서 테스트:
 
 ```bash
 claude --plugin-dir ./packages/harness
+claude --plugin-dir ./packages/second-brain
 ```
+
+### skills.sh
+
+```bash
+# 전체 스킬 설치
+npx skills add rulebased-io/claude-plugin
+
+# 특정 스킬만 설치
+npx skills add rulebased-io/claude-plugin --skill harness-audit
+```
+
+### CLI (npm) — harness만 해당
+
+```bash
+npx @rulebased/harness audit
+npx @rulebased/harness score
+npx @rulebased/harness init
+npx @rulebased/harness recommend
+npx @rulebased/harness eval-log
+```
+
+---
+
+## Harness 스킬
 
 설치 후 사용 가능한 slash 커맨드:
 
@@ -37,28 +79,6 @@ claude --plugin-dir ./packages/harness
 ```
 
 플러그인에는 **Stop hook**이 포함되어 있어, 10회 이상의 에이전트 턴이 있는 세션 종료 시 자동으로 부합도를 평가합니다.
-
-### skills.sh
-
-```bash
-# 전체 스킬 설치
-npx skills add rulebased-io/claude-plugin
-
-# 특정 스킬만 설치
-npx skills add rulebased-io/claude-plugin --skill harness-audit
-```
-
-### CLI (npm)
-
-```bash
-npx @rulebased/harness audit
-npx @rulebased/harness score
-npx @rulebased/harness init
-npx @rulebased/harness recommend
-npx @rulebased/harness eval-log
-```
-
-## 스킬
 
 ### harness-audit
 
@@ -80,21 +100,6 @@ npx @rulebased/harness eval-log
 ### harness-score
 
 카테고리별 상세 점수 리포트. 각 하네스 영역이 얼마나 구현되어 있는지 보여줍니다.
-
-```
-## Harness Score Report
-
-[################----]  **81/100 (B)**
-
-### Context Engineering  [####################]  100/100  (9/9)
-- [PASS] AGENTS.md exists
-- [PASS] AGENTS.md includes build/test commands
-...
-
-### Constraints  [--------------------]  0/100  (0/2)
-- [FAIL] Linter configuration exists
-  -> ESLint, Biome, ruff 등의 린터 설정을 추가하세요.
-```
 
 ### harness-init
 
@@ -131,23 +136,88 @@ Claude Code 대화 기록(transcript)을 분석하여 하네스 부합도를 평
 
 **자동 실행:** 10회 이상의 에이전트 턴이 있는 세션 종료 시 Stop hook으로 자동 실행됩니다.
 
+---
+
+## Second Brain 스킬
+
+```
+/rulebased-second-brain:init        # 세컨드 브레인 구조 초기화
+/rulebased-second-brain:capture     # 빠른 캡처 (inbox)
+/rulebased-second-brain:connect     # 관련 지식 연결
+/rulebased-second-brain:review      # 간격 반복 리뷰
+/rulebased-second-brain:organize    # 분류 및 이동
+/rulebased-second-brain:synthesize  # 연결에서 인사이트 생성
+/rulebased-second-brain:search      # 전체 검색
+/rulebased-second-brain:daily       # 일일 저널 작성
+/rulebased-second-brain:refactor    # 구조 개선 및 정리
+```
+
+### second-brain-init
+
+완전한 세컨드 브레인 구조를 스캐폴딩합니다:
+
+```
+<brain-root>/
+├── BRAIN.md              # 외부 에이전트 접근 정책
+├── AGENTS.md             # Agent 역할 및 워크플로우
+├── system/               # 규칙, 스키마, 용어집, 템플릿
+├── inbox/                # 빠른 캡처 (CODE: Capture)
+├── workspace/            # 활성 작업 공간
+│   ├── knowledge/        # 메모, 읽기 정리, 정제된 지식
+│   ├── code/             # 스니펫, TIL
+│   ├── projects/         # 활성 프로젝트
+│   └── resources/        # 참고 자료
+├── ideas/                # 아이디어 스테이징 (seed→growing→ripe)
+├── journal/              # 일상 회고
+├── areas/                # 지속 관리 영역 (PARA)
+├── archives/             # 비활성 보관
+└── brains/               # 외부 에이전트용 Permission Set
+```
+
+### 기타 second-brain 스킬
+
+- **capture** — 최소 마찰로 inbox에 빠른 캡처
+- **connect** — 관련 항목을 찾고 wiki-link 생성
+- **review** — 간격 반복으로 지식 리뷰
+- **organize** — inbox 항목 분류, 적절한 위치로 이동
+- **synthesize** — 연결된 지식에서 인사이트 생성
+- **search** — 전문 검색 및 태그 기반 검색
+- **daily** — 오늘의 저널 작성 또는 이어쓰기
+- **refactor** — 콘텐츠 구조 개선, 병합, 분리
+
+---
+
+## 점수 체계 (Harness)
+
+| 심각도 | 가중치 | 예시 |
+|--------|--------|------|
+| Critical | 3 | AGENTS.md 존재, build/test/lint 명령어, CI 파이프라인, .gitignore |
+| Important | 2 | 아키텍처 설명, 린터, 포맷터, pre-commit, lockfile, ADRs |
+| Nice-to-have | 1 | 워크플로우 폴더, eval 데이터셋, 보안 문서, 기술 부채 트래커 |
+
+등급: A (90+), B (75+), C (60+), D (40+), F
+
 ## 프로젝트 구조
 
 ```
-@rulebased/harness (pnpm monorepo)
+rulebased-plugin (pnpm monorepo)
 ├── packages/
-│   └── harness/                 # @rulebased/harness - plugin + core + CLI
-│       ├── skills/              # Skills (skills.sh + Claude Code)
+│   ├── harness/                 # @rulebased/harness - audit, init, recommend, eval
+│   │   ├── skills/              # Skills (skills.sh + Claude Code)
+│   │   ├── commands/            # Claude Code commands
+│   │   ├── agents/              # Autonomous agents
+│   │   ├── hooks/               # Plugin hooks
+│   │   ├── reference/           # Evaluation criteria
+│   │   ├── src/                 # Auditor, recommender, initializer, CLI
+│   │   └── tests/               # Tests + fixtures
+│   └── second-brain/            # @rulebased/second-brain - PKM 도구
+│       ├── skills/              # 9개 스킬 (init, capture, connect, ...)
 │       ├── commands/            # Claude Code commands
-│       ├── agents/              # Autonomous agents
-│       ├── hooks/               # Plugin hooks
-│       ├── reference/           # Evaluation criteria
-│       ├── docs/                # Shared docs (skills/commands)
-│       ├── src/                 # Auditor, recommender, initializer, CLI
-│       └── tests/               # Tests + fixtures
-├── specs/                       # Spec workflow (todo/done/backlog)
-├── tasks/                       # Task workflow (todo/done)
-└── docs/                        # Documentation
+│       ├── scaffold/            # Init 템플릿 및 구조
+│       └── docs/                # 공유 문서
+├── specs/                       # Spec 워크플로우 (todo/done/backlog)
+├── tasks/                       # Task 워크플로우 (todo/done)
+└── docs/                        # 문서
 ```
 
 ## 개발
@@ -158,16 +228,6 @@ pnpm build
 pnpm test          # 26개 테스트
 ```
 
-## 점수 체계
-
-| 심각도 | 가중치 | 예시 |
-|--------|--------|------|
-| Critical | 3 | AGENTS.md 존재, build/test/lint 명령어, CI 파이프라인, .gitignore |
-| Important | 2 | 아키텍처 설명, 린터, 포맷터, pre-commit, lockfile, ADRs |
-| Nice-to-have | 1 | 워크플로우 폴더, eval 데이터셋, 보안 문서, 기술 부채 트래커 |
-
-등급: A (90+), B (75+), C (60+), D (40+), F
-
 ## 로드맵
 
 - [x] npm 배포 — `@rulebased/harness`
@@ -175,6 +235,7 @@ pnpm test          # 26개 테스트
 - [ ] 내장 템플릿 — 타입별 AGENTS.md, 훅, audit 프리셋
 - [ ] 하네스 가져오기 — 다른 프로젝트의 하네스를 비교 후 적용
 - [ ] 멀티 에이전트 플러그인 — Codex, Cursor 지원
+- [ ] npm 배포 — `@rulebased/second-brain`
 
 ## 라이선스
 

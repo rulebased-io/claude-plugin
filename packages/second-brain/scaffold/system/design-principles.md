@@ -42,7 +42,7 @@ type: permanent
 ┌─────────────────────────────────┐
 │  클라이언트 (Obsidian, VS Code) │  ← UI, 렌더링, 동기화
 ├─────────────────────────────────┤
-│  SKILL (capture, connect, ...)  │  ← 노트 생성·수정·검색 로직
+│  SKILL (capture, connect, ...)  │  ← 콘텐츠 생성·수정·검색 로직
 ├─────────────────────────────────┤
 │  Transit Schema                 │  ← 도구 간 전달 형식
 ├─────────────────────────────────┤
@@ -55,12 +55,12 @@ type: permanent
 | 계층 | 책임 | 예시 |
 |------|------|------|
 | **클라이언트** | 파일 읽기/쓰기, UI 렌더링 | Obsidian이 frontmatter를 프로퍼티 패널로 표시 |
-| **SKILL** | 비즈니스 로직, 노트 품질 관리 | capture 스킬이 inbox에 노트 생성 |
-| **Transit Schema** | 도구 간 데이터 전달 규약 | `NoteTransit` 인터페이스 |
+| **SKILL** | 비즈니스 로직, 콘텐츠 품질 관리 | capture 스킬이 inbox에 파일 생성 |
+| **Transit Schema** | 도구 간 데이터 전달 규약 | `EntryTransit` 인터페이스 |
 | **Storage Schema** | 파일 포맷, frontmatter 규칙 | `standard-schema.md` |
 
 ### 설계 결정
 
-- SKILL은 Transit Schema로 노트를 전달하고, 최종 저장은 Storage Schema를 따른다
+- SKILL은 Transit Schema로 데이터를 전달하고, 최종 저장은 Storage Schema를 따른다
 - 클라이언트가 바뀌어도(Obsidian → 다른 도구) SKILL과 저장 형식은 동일하다
 - 새로운 SKILL을 추가해도 기존 파일 구조에 영향 없다

@@ -15,9 +15,9 @@ type: permanent
 
 ```
 workspace/
-├── notes/
-│   ├── fleeting/      # 일시적 메모 (나중에 정리 또는 삭제)
-│   └── literature/    # 읽은 것에서 추출한 노트 (source 필수)
+├── knowledge/
+│   ├── memos/         # 빠른 메모 (inbox에서 분류된 것)
+│   └── readings/      # 읽은 것에서 추출한 정리 (source 필수)
 ├── code/
 │   ├── snippets/      # 재사용 코드 조각
 │   └── til/           # Today I Learned
@@ -27,13 +27,13 @@ workspace/
 
 ---
 
-## notes/
+## knowledge/
 
-### fleeting (일시 노트)
-- 빠르게 적은 메모. inbox/에서 분류되어 온 것
-- 정기 리뷰에서 permanent로 승격하거나 삭제
+### memos (메모)
+- 빠른 메모, inbox에서 분류되어 온 것
+- 정기 리뷰에서 knowledge로 승격하거나 삭제
 
-### literature (문헌 노트)
+### readings (읽기 정리)
 - 책, 글, 영상 등 외부 자료에서 추출한 핵심 내용
 - `source` 필드 필수 — 출처를 반드시 기록
 - 원문 복사가 아닌 자신의 말로 재구성
@@ -60,12 +60,11 @@ workspace/
 projects/
 └── my-project/
     ├── README.md      # 프로젝트 개요, 목표, 상태
-    ├── notes/         # 프로젝트 관련 노트
     └── decisions/     # 결정 기록 (ADR 스타일)
 ```
 
 - 완료된 프로젝트 → `archives/`로 이동
-- 프로젝트 노트에서 `ideas/`의 원본 아이디어로 역링크
+- 프로젝트에서 `ideas/`의 원본 아이디어로 역링크
 
 ---
 
