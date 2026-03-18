@@ -155,6 +155,7 @@ rulebased-harness/
 ```
 
 - `skills/*/SKILL.md`와 `commands/*.md`에는 **각 명령에 필요한 지시문을 직접 넣는다**
+- 지시문은 `CLAUDE_PLUGIN_PATH`를 통해 `reference/` 파일을 읽도록 안내해야 한다 (평가 기준, 가이드, 코드 예시 등은 모두 `reference/`에 있음)
 - `docs/*.md`는 개발자가 참조하는 원본이다. 플러그인 런타임에서 docs/에 접근할 수 없으므로, skills/commands가 docs/를 참조하게 만들지 않는다
 - skills/commands의 내용을 변경할 때는 `docs/*.md` 원본을 먼저 수정하고, 그 내용을 skills/commands에 반영한다
 - skills와 commands는 동일한 docs/ 원본에서 파생되므로 내용이 동일해야 한다 (frontmatter만 다름)
