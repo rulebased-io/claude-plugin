@@ -1,7 +1,7 @@
 ---
 name: connect
 description: Discover and suggest connections (wiki-links) between notes
-type: reference
+type: skill
 created: 2026-03-19
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: daily
 description: Daily note creation and morning/evening review routine
-type: reference
+type: skill
 created: 2026-03-19
 ---
 

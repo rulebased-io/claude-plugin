@@ -24,7 +24,7 @@
       "name": "second-brain",
       "description": "Second brain tools — capture, connect, review, organize, synthesize, search, daily, refactor",
       "source": "./packages/second-brain",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "category": "productivity",
       "author": {
         "name": "rulebased.io",

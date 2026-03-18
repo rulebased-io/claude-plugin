@@ -1,7 +1,7 @@
 ---
 name: refactor
 description: Split large notes, merge small notes, and move notes between folders
-type: reference
+type: skill
 created: 2026-03-19
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: capture
 description: Quick capture of ideas, notes, and references into the brain's inbox
-type: reference
+type: skill
 created: 2026-03-19
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: organize
 description: Analyze and improve the brain's structure — tags, folders, duplicates, and health
-type: reference
+type: skill
 created: 2026-03-19
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: search
 description: Search the brain for notes by keyword, tag, date, folder, or status
-type: reference
+type: skill
 created: 2026-03-19
 ---
 

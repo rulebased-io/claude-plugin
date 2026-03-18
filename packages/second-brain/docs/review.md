@@ -1,7 +1,7 @@
 ---
 name: review
 description: Resurface and review old notes using spaced repetition or random selection
-type: reference
+type: skill
 created: 2026-03-19
 ---
 

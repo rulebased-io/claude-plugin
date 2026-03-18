@@ -1,7 +1,7 @@
 ---
 name: synthesize
 description: Combine multiple related notes into a new synthesis with extracted insights
-type: reference
+type: skill
 created: 2026-03-19
 ---
 
