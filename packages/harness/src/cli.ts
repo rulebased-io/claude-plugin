@@ -10,10 +10,14 @@
 
 import { resolve } from "node:path";
 import { audit, formatReport, formatScore } from "./auditor.js";
-import { recommend, formatRecommendations } from "./recommender.js";
 import { initHarness } from "./initializer.js";
-import { findLatestTranscript, parseTranscript, computeStats } from "./transcript.js";
 import { evaluateLog, formatLogEval } from "./log-evaluator.js";
+import { formatRecommendations, recommend } from "./recommender.js";
+import {
+  computeStats,
+  findLatestTranscript,
+  parseTranscript,
+} from "./transcript.js";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -71,7 +75,9 @@ switch (command) {
     const projectPath = getProjectPath();
     const force = hasFlag("--force");
     const preset = getOption("--preset") as "minimal" | "standard" | undefined;
-    console.log(`Initializing harness in: ${projectPath} (preset: ${preset ?? "standard"})\n`);
+    console.log(
+      `Initializing harness in: ${projectPath} (preset: ${preset ?? "standard"})\n`,
+    );
 
     const result = initHarness(projectPath, { force, preset });
 
@@ -106,7 +112,14 @@ switch (command) {
     const report = audit(projectPath);
 
     if (hasFlag("--json")) {
-      console.log(JSON.stringify({ score: report.score, grade: report.grade, passed: report.summary.passed, total: report.summary.total }));
+      console.log(
+        JSON.stringify({
+          score: report.score,
+          grade: report.grade,
+          passed: report.summary.passed,
+          total: report.summary.total,
+        }),
+      );
     } else {
       console.log(formatScore(report));
     }
@@ -128,10 +141,13 @@ switch (command) {
 
   case "eval-log": {
     const projectPath = getProjectPath();
-    const transcriptPath = getOption("--file") ?? findLatestTranscript(projectPath);
+    const transcriptPath =
+      getOption("--file") ?? findLatestTranscript(projectPath);
 
     if (!transcriptPath) {
-      console.error("No transcript found. Specify a path with --file or run from a project with Claude Code history.");
+      console.error(
+        "No transcript found. Specify a path with --file or run from a project with Claude Code history.",
+      );
       process.exit(1);
     }
 

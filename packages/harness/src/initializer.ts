@@ -6,15 +6,18 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { InitOptions, InitResult, PresetName } from "./types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const TEMPLATES_DIR = join(__dirname, "../../templates");
+const _TEMPLATES_DIR = join(__dirname, "../../templates");
 
 /** Initialize the harness structure in a project */
-export function initHarness(projectPath: string, options: InitOptions = {}): InitResult {
+export function initHarness(
+  projectPath: string,
+  options: InitOptions = {},
+): InitResult {
   const created: string[] = [];
   const skipped: string[] = [];
 
@@ -25,7 +28,7 @@ export function initHarness(projectPath: string, options: InitOptions = {}): Ini
   writeTemplate(
     projectPath,
     ".harness.json",
-    JSON.stringify({ preset }, null, 2) + "\n",
+    `${JSON.stringify({ preset }, null, 2)}\n`,
     options.force,
     created,
     skipped,
@@ -67,7 +70,14 @@ export function initHarness(projectPath: string, options: InitOptions = {}): Ini
   // 4. Add .gitignore (skip if it already exists)
   const gitignorePath = join(projectPath, ".gitignore");
   if (!existsSync(gitignorePath)) {
-    writeTemplate(projectPath, ".gitignore", defaultGitignore(), options.force, created, skipped);
+    writeTemplate(
+      projectPath,
+      ".gitignore",
+      defaultGitignore(),
+      options.force,
+      created,
+      skipped,
+    );
   }
 
   return {
@@ -165,12 +175,12 @@ function createDir(
 ): void {
   const fullPath = join(projectPath, relativePath);
   if (existsSync(fullPath)) {
-    skipped.push(relativePath + "/");
+    skipped.push(`${relativePath}/`);
     return;
   }
   mkdirSync(fullPath, { recursive: true });
   writeFileSync(join(fullPath, ".gitkeep"), "", "utf-8");
-  created.push(relativePath + "/");
+  created.push(`${relativePath}/`);
 }
 
 function guessProjectName(projectPath: string): string {

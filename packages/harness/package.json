@@ -19,7 +19,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "NODE_OPTIONS='--experimental-vm-modules' pnpm exec jest",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' pnpm exec jest --watch"
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' pnpm exec jest --watch",
+    "lint": "tsc --noEmit && biome check src/"
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",

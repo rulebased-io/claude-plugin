@@ -5,14 +5,21 @@
  * Or: ~/.claude/projects/<project>/<session-id>.jsonl
  */
 
-import { readFileSync, existsSync, readdirSync } from "node:fs";
-import { join, basename } from "node:path";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
+import { join } from "node:path";
 
 // ─── Types ───
 
 export interface TranscriptEvent {
-  type: "user" | "assistant" | "progress" | "system" | "file-history-snapshot" | "queue-operation" | string;
+  type:
+    | "user"
+    | "assistant"
+    | "progress"
+    | "system"
+    | "file-history-snapshot"
+    | "queue-operation"
+    | string;
   uuid: string;
   parentUuid: string | null;
   timestamp: string;
@@ -30,7 +37,7 @@ export interface TranscriptStats {
   assistantTurns: number;
   systemEvents: number;
   progressEvents: number;
-  autonomyRatio: number;      // assistant / (user + assistant)
+  autonomyRatio: number; // assistant / (user + assistant)
   durationMinutes: number;
   firstTimestamp: string;
   lastTimestamp: string;
@@ -75,13 +82,16 @@ export function computeStats(events: TranscriptEvent[]): TranscriptStats {
 
   const first = timestamps[0] ?? "";
   const last = timestamps[timestamps.length - 1] ?? "";
-  const durationMs = first && last ? new Date(last).getTime() - new Date(first).getTime() : 0;
+  const durationMs =
+    first && last ? new Date(last).getTime() - new Date(first).getTime() : 0;
 
   // Extract tool uses from assistant messages
   const toolCounts = new Map<string, number>();
   for (const event of events) {
     if (event.type === "assistant" && event.message) {
-      const msg = event.message as { content?: Array<{ type: string; name?: string }> };
+      const msg = event.message as {
+        content?: Array<{ type: string; name?: string }>;
+      };
       if (Array.isArray(msg.content)) {
         for (const block of msg.content) {
           if (block.type === "tool_use" && block.name) {
@@ -105,7 +115,8 @@ export function computeStats(events: TranscriptEvent[]): TranscriptStats {
     assistantTurns,
     systemEvents,
     progressEvents,
-    autonomyRatio: totalConversational > 0 ? assistantTurns / totalConversational : 0,
+    autonomyRatio:
+      totalConversational > 0 ? assistantTurns / totalConversational : 0,
     durationMinutes: Math.round(durationMs / 60000),
     firstTimestamp: first,
     lastTimestamp: last,
@@ -121,7 +132,7 @@ export function findProjectTranscripts(projectPath: string): string[] {
   if (!existsSync(claudeDir)) return [];
 
   // Derive project directory name from path
-  const projectDirName = "-" + projectPath.replace(/^\//, "").replace(/\//g, "-");
+  const projectDirName = `-${projectPath.replace(/^\//, "").replace(/\//g, "-")}`;
   const projectDir = join(claudeDir, projectDirName);
 
   if (!existsSync(projectDir)) return [];

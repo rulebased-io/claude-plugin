@@ -5,3 +5,8 @@ coverage/
 *.tsbuildinfo
 .DS_Store
 tests/tmp-*
+
+# Secrets
+.env
+.env.*
+.env.local

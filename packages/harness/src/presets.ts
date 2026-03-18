@@ -11,14 +11,21 @@ const MINIMAL_CONFIG: HarnessConfig = {
   preset: "minimal",
   checks: {
     disable: [
-      "ctx-agents-concise", "ctx-agents-security", "ctx-agents-links-docs",
-      "ctx-sub-agents", "ctx-claude-exists",
-      "cst-precommit", "cst-arch-enforcement",
-      "eval-ci-lint", "eval-dataset",
-      "ent-tech-debt", "ent-docs-in-repo",
+      "ctx-agents-concise",
+      "ctx-agents-security",
+      "ctx-agents-links-docs",
+      "ctx-sub-agents",
+      "ctx-claude-exists",
+      "cst-precommit",
+      "cst-arch-enforcement",
+      "eval-ci-lint",
+      "eval-dataset",
+      "ent-tech-debt",
+      "ent-docs-in-repo",
       "saf-security-doc",
       "know-adrs",
-      "wf-specs-dir", "wf-tasks-dir",
+      "wf-specs-dir",
+      "wf-tasks-dir",
     ],
   },
 };
@@ -63,7 +70,10 @@ export function mergeConfig(
 }
 
 /** Check whether a check ID is disabled by the config */
-export function isCheckDisabled(checkId: string, config: HarnessConfig): boolean {
+export function isCheckDisabled(
+  checkId: string,
+  config: HarnessConfig,
+): boolean {
   if (config.checks?.enable?.length) {
     return !config.checks.enable.includes(checkId);
   }

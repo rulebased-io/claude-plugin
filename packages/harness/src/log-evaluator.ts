@@ -12,7 +12,7 @@ export interface LogEvalCheck {
   id: string;
   name: string;
   pass: boolean;
-  score: number;         // 0-100
+  score: number; // 0-100
   details: string;
 }
 
@@ -42,10 +42,15 @@ export function evaluateLog(stats: TranscriptStats): LogEvalReport {
   );
 
   const grade =
-    overallScore >= 90 ? "A" :
-    overallScore >= 75 ? "B" :
-    overallScore >= 60 ? "C" :
-    overallScore >= 40 ? "D" : "F";
+    overallScore >= 90
+      ? "A"
+      : overallScore >= 75
+        ? "B"
+        : overallScore >= 60
+          ? "C"
+          : overallScore >= 40
+            ? "D"
+            : "F";
 
   return {
     sessionId: stats.sessionId,
@@ -65,17 +70,27 @@ function checkHumanTurns(stats: TranscriptStats): LogEvalCheck {
   const total = userTurns + assistantTurns;
 
   if (total === 0) {
-    return { id: "human-turns", name: "Human Turn Count", pass: false, score: 0, details: "No conversation data" };
+    return {
+      id: "human-turns",
+      name: "Human Turn Count",
+      pass: false,
+      score: 0,
+      details: "No conversation data",
+    };
   }
 
   // Ideal: low human intervention. Score decreases as human ratio increases.
   const humanRatio = userTurns / total;
   let score: number;
-  if (humanRatio <= 0.2) score = 100;       // Excellent: <20% human
-  else if (humanRatio <= 0.3) score = 80;   // Good: 20-30%
-  else if (humanRatio <= 0.4) score = 60;   // OK: 30-40%
-  else if (humanRatio <= 0.5) score = 40;   // Below average: 40-50%
-  else score = 20;                           // High intervention: >50%
+  if (humanRatio <= 0.2)
+    score = 100; // Excellent: <20% human
+  else if (humanRatio <= 0.3)
+    score = 80; // Good: 20-30%
+  else if (humanRatio <= 0.4)
+    score = 60; // OK: 30-40%
+  else if (humanRatio <= 0.5)
+    score = 40; // Below average: 40-50%
+  else score = 20; // High intervention: >50%
 
   return {
     id: "human-turns",
@@ -115,7 +130,7 @@ function checkBuildTestExecution(stats: TranscriptStats): LogEvalCheck {
   let score: number;
   if (!hasBash) {
     score = 30; // No shell commands at all
-  } else if (bashUses!.count >= 5) {
+  } else if ((bashUses?.count ?? 0) >= 5) {
     score = 100; // Active shell usage
   } else {
     score = 60;
@@ -140,7 +155,9 @@ function checkToolDiversity(stats: TranscriptStats): LogEvalCheck {
   else if (uniqueTools >= 1) score = 40;
   else score = 20;
 
-  const toolNames = stats.toolUses.map((t) => `${t.toolName}(${t.count})`).join(", ");
+  const toolNames = stats.toolUses
+    .map((t) => `${t.toolName}(${t.count})`)
+    .join(", ");
 
   return {
     id: "tool-diversity",
@@ -155,10 +172,12 @@ function checkToolDiversity(stats: TranscriptStats): LogEvalCheck {
 function checkSessionDuration(stats: TranscriptStats): LogEvalCheck {
   const mins = stats.durationMinutes;
   let score: number;
-  if (mins >= 5 && mins <= 120) score = 100;     // Sweet spot
+  if (mins >= 5 && mins <= 120)
+    score = 100; // Sweet spot
   else if (mins >= 2 && mins <= 180) score = 80;
-  else if (mins < 2) score = 40;                   // Too short
-  else score = 60;                                  // Very long
+  else if (mins < 2)
+    score = 40; // Too short
+  else score = 60; // Very long
 
   return {
     id: "session-duration",
@@ -179,12 +198,18 @@ export function formatLogEval(report: LogEvalReport): string {
   lines.push(``);
   lines.push(`**Score: ${report.overallScore}/100 (${report.grade})**`);
   lines.push(`**Session: ${report.sessionId}**`);
-  lines.push(`**Duration: ${report.stats.durationMinutes} min** | Human turns: ${report.stats.userTurns} | Agent turns: ${report.stats.assistantTurns}`);
+  lines.push(
+    `**Duration: ${report.stats.durationMinutes} min** | Human turns: ${report.stats.userTurns} | Agent turns: ${report.stats.assistantTurns}`,
+  );
   lines.push(``);
 
   for (const check of report.checks) {
     const icon = check.pass ? "PASS" : "FAIL";
-    const bar = "[" + "#".repeat(Math.round(check.score / 5)) + "-".repeat(20 - Math.round(check.score / 5)) + "]";
+    const bar =
+      "[" +
+      "#".repeat(Math.round(check.score / 5)) +
+      "-".repeat(20 - Math.round(check.score / 5)) +
+      "]";
     lines.push(`### ${check.name}  ${bar}  ${check.score}/100`);
     lines.push(``);
     lines.push(`- [${icon}] ${check.details}`);

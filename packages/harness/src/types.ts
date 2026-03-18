@@ -19,20 +19,20 @@ export interface AuditCheck {
 }
 
 export type AuditCategory =
-  | "context"         // AGENTS.md, ARCHITECTURE.md, docs/, progressive disclosure
-  | "bootstrap"       // One-command setup, reproducible environment
-  | "constraints"     // Linter, formatter, pre-commit, architectural enforcement
-  | "eval"            // CI pipeline, tests, coverage, regression
-  | "entropy"         // Tech debt tracking, doc freshness, pattern enforcement
-  | "safety"          // Secrets, .gitignore, security docs
-  | "knowledge"       // ADRs, decision records, in-repo knowledge
-  | "workflow";       // specs/, tasks/ directories
+  | "context" // AGENTS.md, ARCHITECTURE.md, docs/, progressive disclosure
+  | "bootstrap" // One-command setup, reproducible environment
+  | "constraints" // Linter, formatter, pre-commit, architectural enforcement
+  | "eval" // CI pipeline, tests, coverage, regression
+  | "entropy" // Tech debt tracking, doc freshness, pattern enforcement
+  | "safety" // Secrets, .gitignore, security docs
+  | "knowledge" // ADRs, decision records, in-repo knowledge
+  | "workflow"; // specs/, tasks/ directories
 
 export interface AuditReport {
   projectPath: string;
   timestamp: string;
-  score: number;           // 0-100
-  grade: string;           // A, B, C, D, F
+  score: number; // 0-100
+  grade: string; // A, B, C, D, F
   checks: AuditCheck[];
   summary: {
     total: number;
