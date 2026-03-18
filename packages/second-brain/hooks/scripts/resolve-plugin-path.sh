@@ -15,7 +15,7 @@ INPUT=$(cat)
 PROMPT=$(echo "$INPUT" | grep -o '"prompt":"[^"]*"' | head -1 | cut -d'"' -f4 2>/dev/null || echo "")
 
 # Check if the prompt matches any second-brain skill pattern
-if ! echo "$PROMPT" | grep -qE '/second-brain:(capture|connect|review|organize|synthesize|search|daily|refactor)'; then
+if ! echo "$PROMPT" | grep -qE '/second-brain:(init|capture|connect|review|organize|synthesize|search|daily|refactor)'; then
   exit 0
 fi
 

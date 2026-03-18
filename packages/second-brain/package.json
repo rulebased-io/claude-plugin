@@ -1,7 +1,7 @@
 {
   "name": "@rulebased/second-brain",
-  "version": "0.1.1",
-  "description": "Second brain tools for Claude Code — capture, connect, review, organize, synthesize, search, daily, refactor",
+  "version": "0.2.0",
+  "description": "Second brain tools for Claude Code — init, capture, connect, review, organize, synthesize, search, daily, refactor",
   "type": "module",
   "license": "MIT",
   "repository": {
