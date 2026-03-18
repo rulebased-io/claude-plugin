@@ -2,9 +2,12 @@
 #
 # resolve-plugin-path.sh — Resolve CLAUDE_PLUGIN_PATH for harness skills
 #
-# Triggered by UserPromptSubmit hook when a harness skill is invoked.
+# Triggered by UserPromptSubmit hook.
 # Reads the user prompt from stdin and checks if it matches harness skill patterns.
-# If matched, outputs the resolved plugin path so documents can reference plugin-relative files.
+# If matched, outputs the plugin path so Claude can locate plugin files.
+#
+# Reference: https://code.claude.com/docs/en/hooks.md
+# UserPromptSubmit stdout is automatically visible to Claude.
 #
 
 set -euo pipefail
@@ -23,4 +26,11 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_PATH="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-echo "CLAUDE_PLUGIN_PATH=${PLUGIN_PATH}"
+cat <<EOF
+[rulebased-harness plugin]
+CLAUDE_PLUGIN_PATH=${PLUGIN_PATH}
+
+This is the installed path of the rulebased-harness plugin.
+Use this path to read any plugin files referenced in the skill documentation.
+For example: ${PLUGIN_PATH}/reference/checklist.md
+EOF

@@ -3,11 +3,23 @@ name: audit
 description: Audits your project's harness engineering setup and assigns a score (checks 17 items including AGENTS.md, specs, constraints, eval, etc.)
 ---
 
+> **Plugin path**: The `CLAUDE_PLUGIN_PATH` value provided by the hook is the root of this plugin.
+> Use it to read plugin files. Plugin structure:
+> ```
+> ${CLAUDE_PLUGIN_PATH}/
+> ├── reference/checklist.md    ← Full audit checklist (17 items, severity, how-to)
+> ├── skills/audit/SKILL.md     ← This file
+> ├── skills/init/SKILL.md
+> ├── skills/recommend/SKILL.md
+> ├── skills/eval-log/SKILL.md
+> └── agents/harness-auditor.md
+> ```
+
 Audits the current project's harness engineering setup.
 
 ## Audit Criteria
 
-The audit is based on the three pillars of OpenAI Harness Engineering:
+The audit is based on the three pillars of harness engineering:
 
 ### 1. Context Engineering
 - AGENTS.md exists and contains required sections (build commands, architecture, common pitfalls)
@@ -36,9 +48,7 @@ Score: 0-100 / Grades: A (90+), B (75+), C (60+), D (40+), F
 
 ## Execution
 
-Check for the existence of the following files/directories in the project root:
-
-Refer to the full checklist at `$CLAUDE_PLUGIN_PATH/reference/checklist.md`.
+Read the full checklist from `${CLAUDE_PLUGIN_PATH}/reference/checklist.md` and check each item against the current project.
 
 You can also use the CLI:
 ```bash

@@ -3,6 +3,9 @@ name: recommend
 description: Recommends missing harness elements for your project and auto-generates them (AGENTS.md, lint, eval, CI, etc.)
 ---
 
+> **Plugin path**: The `CLAUDE_PLUGIN_PATH` value provided by the hook is the root of this plugin.
+> Read `${CLAUDE_PLUGIN_PATH}/reference/checklist.md` for the full audit checklist to base recommendations on.
+
 Audits the current project's harness state and recommends missing elements.
 
 ## Workflow

@@ -3,6 +3,9 @@ name: init
 description: Initializes the harness structure for the current project (AGENTS.md, specs/, tasks/, etc.)
 ---
 
+> **Plugin path**: The `CLAUDE_PLUGIN_PATH` value provided by the hook is the root of this plugin.
+> Use it to read plugin files when additional context is needed (e.g. `${CLAUDE_PLUGIN_PATH}/reference/checklist.md`).
+
 Initializes the harness engineering structure for the current project.
 
 ## Tasks Performed
