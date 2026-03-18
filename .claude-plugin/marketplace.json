@@ -21,10 +21,10 @@
       }
     },
     {
-      "name": "second-brain",
+      "name": "rulebased-second-brain",
       "description": "Second brain tools — init, capture, connect, review, organize, synthesize, search, daily, refactor",
       "source": "./packages/second-brain",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "category": "productivity",
       "author": {
         "name": "rulebased.io",

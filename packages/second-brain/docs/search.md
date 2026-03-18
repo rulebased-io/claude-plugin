@@ -12,7 +12,7 @@ Search across all notes using multiple strategies.
 - User is looking for a specific note
 - Exploring what exists on a topic
 - Finding notes by tag, date range, or status
-- `/second-brain:search` invoked
+- `/rulebased-second-brain:search` invoked
 
 ## Procedure
 

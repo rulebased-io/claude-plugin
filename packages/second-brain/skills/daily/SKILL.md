@@ -10,7 +10,7 @@ Create today's daily note and run the daily brain routine.
 - Start of day: create daily note, review agenda
 - End of day: summarize, process inbox
 - Journaling or reflection
-- `/second-brain:daily` invoked
+- `/rulebased-second-brain:daily` invoked
 
 ## Procedure
 

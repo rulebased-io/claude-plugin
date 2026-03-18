@@ -13,7 +13,7 @@ Combine multiple notes into a synthesis that extracts patterns and insights.
 - Preparing a write-up or document from scattered notes
 - Creating a comprehensive overview from fragments
 - Building a new MOC with synthesized content
-- `/second-brain:synthesize` invoked
+- `/rulebased-second-brain:synthesize` invoked
 
 ## Procedure
 

@@ -13,7 +13,7 @@ Analyze the brain's health and suggest structural improvements.
 - After a period of heavy capture without organization
 - Checking for duplicates or inconsistencies
 - Building or updating Maps of Content
-- `/second-brain:organize` invoked
+- `/rulebased-second-brain:organize` invoked
 
 ## Procedure
 

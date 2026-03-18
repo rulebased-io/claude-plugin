@@ -11,7 +11,7 @@ Find hidden connections between notes and suggest wiki-links.
 - After a batch of captures, to weave them into the graph
 - Finding orphan notes (no incoming or outgoing links)
 - Building or updating a Map of Content (MOC)
-- `/second-brain:connect` invoked
+- `/rulebased-second-brain:connect` invoked
 
 ## Procedure
 

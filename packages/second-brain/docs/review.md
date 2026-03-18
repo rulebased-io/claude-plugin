@@ -12,7 +12,7 @@ Bring old notes back to attention for review, update, or archival.
 - Regular review habit (weekly/daily)
 - Processing inbox backlog
 - Rediscovering forgotten knowledge
-- `/second-brain:review` invoked
+- `/rulebased-second-brain:review` invoked
 
 ## Procedure
 

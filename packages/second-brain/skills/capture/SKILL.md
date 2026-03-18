@@ -10,7 +10,7 @@ Rapidly save an idea, reference, or thought into `inbox/` before it's lost.
 - User wants to quickly save an idea
 - Capturing a URL, quote, or reference
 - Recording a fleeting thought during other work
-- `/second-brain:capture` invoked
+- `/rulebased-second-brain:capture` invoked
 
 ## Procedure
 

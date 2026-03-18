@@ -11,7 +11,7 @@ Reshape notes to maintain atomic note principles.
 - Multiple small notes cover the same topic
 - Moving notes between folders (inbox → notes, notes → archive)
 - Reorganizing after a connect or organize session
-- `/second-brain:refactor` invoked
+- `/rulebased-second-brain:refactor` invoked
 
 ## Procedure
 
