@@ -1,4 +1,5 @@
-# CLAUDE.md
+# Second Brain
 
-@AGENTS.md 를 참조하세요.
-@system/rules.md 를 참조하세요.
+{{OWNER_NAME}}'s personal knowledge base.
+
+@AGENTS.md

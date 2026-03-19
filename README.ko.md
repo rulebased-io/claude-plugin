@@ -149,7 +149,9 @@ Claude Code 대화 기록(transcript)을 분석하여 하네스 부합도를 평
 /rulebased-second-brain:synthesize  # 연결에서 인사이트 생성
 /rulebased-second-brain:search      # 전체 검색
 /rulebased-second-brain:daily       # 일일 저널 작성
-/rulebased-second-brain:refactor    # 구조 개선 및 정리
+/rulebased-second-brain:refactor        # 구조 개선 및 정리
+/rulebased-second-brain:reference-check # 깨진 참조 검사 및 수정
+/rulebased-second-brain:glossary-sync   # 새 용어 탐지 및 용어집 동기화
 ```
 
 ### second-brain-init
@@ -184,6 +186,8 @@ Claude Code 대화 기록(transcript)을 분석하여 하네스 부합도를 평
 - **search** — 전문 검색 및 태그 기반 검색
 - **daily** — 오늘의 저널 작성 또는 이어쓰기
 - **refactor** — 콘텐츠 구조 개선, 병합, 분리
+- **reference-check** — 깨진 wikilink와 경로 참조를 전수 검사하고 수정 제안
+- **glossary-sync** — 새로운 도메인 용어를 탐지하여 용어집에 동기화
 
 ---
 
@@ -211,7 +215,7 @@ rulebased-plugin (pnpm monorepo)
 │   │   ├── src/                 # Auditor, recommender, initializer, CLI
 │   │   └── tests/               # Tests + fixtures
 │   └── second-brain/            # @rulebased/second-brain - PKM 도구
-│       ├── skills/              # 9개 스킬 (init, capture, connect, ...)
+│       ├── skills/              # 11개 스킬 (init, capture, connect, ...)
 │       ├── commands/            # Claude Code commands
 │       ├── scaffold/            # Init 템플릿 및 구조
 │       └── docs/                # 공유 문서

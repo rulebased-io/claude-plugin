@@ -149,7 +149,9 @@ Evaluates a Claude Code conversation transcript against harness compliance.
 /rulebased-second-brain:synthesize  # Generate insights from connections
 /rulebased-second-brain:search      # Search across the brain
 /rulebased-second-brain:daily       # Daily journal entry
-/rulebased-second-brain:refactor    # Restructure and clean up
+/rulebased-second-brain:refactor        # Restructure and clean up
+/rulebased-second-brain:reference-check # Scan and fix broken references
+/rulebased-second-brain:glossary-sync   # Detect and add new terms to glossary
 ```
 
 ### second-brain-init
@@ -184,6 +186,8 @@ Scaffolds a complete second brain structure with:
 - **search** — Full-text and tag-based search
 - **daily** — Create or continue today's journal entry
 - **refactor** — Restructure, merge, or split content
+- **reference-check** — Scan for broken wikilinks and path references, suggest fixes
+- **glossary-sync** — Detect new domain-specific terms and sync to glossary
 
 ---
 
@@ -211,7 +215,7 @@ rulebased-plugin (pnpm monorepo)
 │   │   ├── src/                 # Auditor, recommender, initializer, CLI
 │   │   └── tests/               # Tests + fixtures
 │   └── second-brain/            # @rulebased/second-brain - PKM tools
-│       ├── skills/              # 9 skills (init, capture, connect, ...)
+│       ├── skills/              # 11 skills (init, capture, connect, ...)
 │       ├── commands/            # Claude Code commands
 │       ├── scaffold/            # Init templates and structure
 │       └── docs/                # Shared documentation
