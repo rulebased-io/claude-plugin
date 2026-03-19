@@ -156,37 +156,33 @@ Evaluates a Claude Code conversation transcript against harness compliance.
 
 ### second-brain-init
 
-Scaffolds a complete second brain structure with:
+Scaffolds a PARA-based second brain structure:
 
 ```
 <brain-root>/
-├── BRAIN.md              # External agent access policy
-├── AGENTS.md             # Agent roles and workflows
-├── system/               # Rules, schema, glossary, templates
+├── CLAUDE.md             # References AGENTS.md
+├── AGENTS.md             # Structure index + rules
+├── system/               # Conventions, workflow, growth triggers
 ├── inbox/                # Quick capture (CODE: Capture)
-├── workspace/            # Active work
-│   ├── knowledge/        # Memos, readings, refined knowledge
-│   ├── code/             # Snippets, TIL
-│   ├── projects/         # Active projects
-│   └── resources/        # Reference materials
-├── ideas/                # Idea staging (seed→growing→ripe)
-├── journal/              # Daily reflection
-├── areas/                # Ongoing life areas (PARA)
+├── projects/             # Active efforts with deadlines
+├── areas/                # Ongoing responsibilities (PARA)
+├── resources/            # Reference materials, learning notes, snippets
 ├── archives/             # Inactive storage
-└── brains/               # Permission sets for external agents
+├── journal/              # Daily reflection
+└── templates/            # Note templates (note, project, journal)
 ```
 
 ### Other second-brain skills
 
 - **capture** — Quick capture to inbox with minimal friction
+- **organize** — Analyze brain health, check growth triggers, fix issues
 - **connect** — Find related items and create wiki-links
-- **review** — Spaced repetition review of knowledge
-- **organize** — Classify inbox items, move to proper locations
+- **review** — Spaced repetition review with maturity promotion
+- **search** — Full-text, tag, date, folder, and status search
+- **refactor** — Split, merge, or move notes with link updates
 - **synthesize** — Generate insights from connected knowledge
-- **search** — Full-text and tag-based search
 - **daily** — Create or continue today's journal entry
-- **refactor** — Restructure, merge, or split content
-- **reference-check** — Scan for broken wikilinks and path references, suggest fixes
+- **reference-check** — Scan for broken wikilinks and path references
 - **glossary-sync** — Detect new domain-specific terms and sync to glossary
 
 ---

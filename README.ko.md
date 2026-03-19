@@ -156,37 +156,33 @@ Claude Code 대화 기록(transcript)을 분석하여 하네스 부합도를 평
 
 ### second-brain-init
 
-완전한 세컨드 브레인 구조를 스캐폴딩합니다:
+PARA 기반 세컨드 브레인 구조를 스캐폴딩합니다:
 
 ```
 <brain-root>/
-├── BRAIN.md              # 외부 에이전트 접근 정책
-├── AGENTS.md             # Agent 역할 및 워크플로우
-├── system/               # 규칙, 스키마, 용어집, 템플릿
+├── CLAUDE.md             # AGENTS.md 참조
+├── AGENTS.md             # 구조 인덱스 + 규칙
+├── system/               # 규약, 워크플로우, 성장 트리거
 ├── inbox/                # 빠른 캡처 (CODE: Capture)
-├── workspace/            # 활성 작업 공간
-│   ├── knowledge/        # 메모, 읽기 정리, 정제된 지식
-│   ├── code/             # 스니펫, TIL
-│   ├── projects/         # 활성 프로젝트
-│   └── resources/        # 참고 자료
-├── ideas/                # 아이디어 스테이징 (seed→growing→ripe)
-├── journal/              # 일상 회고
+├── projects/             # 기한 있는 활성 작업
 ├── areas/                # 지속 관리 영역 (PARA)
+├── resources/            # 참고 자료, 학습 노트, 스니펫
 ├── archives/             # 비활성 보관
-└── brains/               # 외부 에이전트용 Permission Set
+├── journal/              # 일일 회고
+└── templates/            # 노트 템플릿 (note, project, journal)
 ```
 
 ### 기타 second-brain 스킬
 
 - **capture** — 최소 마찰로 inbox에 빠른 캡처
+- **organize** — 브레인 건강 분석, 성장 트리거 체크, 이슈 수정
 - **connect** — 관련 항목을 찾고 wiki-link 생성
-- **review** — 간격 반복으로 지식 리뷰
-- **organize** — inbox 항목 분류, 적절한 위치로 이동
+- **review** — 간격 반복 리뷰 + 성숙도 승격 제안
+- **search** — 전문 검색, 태그, 날짜, 폴더, 상태 검색
+- **refactor** — 노트 분리, 병합, 이동 + 링크 업데이트
 - **synthesize** — 연결된 지식에서 인사이트 생성
-- **search** — 전문 검색 및 태그 기반 검색
 - **daily** — 오늘의 저널 작성 또는 이어쓰기
-- **refactor** — 콘텐츠 구조 개선, 병합, 분리
-- **reference-check** — 깨진 wikilink와 경로 참조를 전수 검사하고 수정 제안
+- **reference-check** — 깨진 wikilink와 경로 참조를 전수 검사
 - **glossary-sync** — 새로운 도메인 용어를 탐지하여 용어집에 동기화
 
 ---

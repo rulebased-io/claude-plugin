@@ -1,9 +1,11 @@
 {
   "name": "@rulebased/harness",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Harness engineering tools for AI agents — audit, init, recommend, eval-log",
   "type": "module",
-  "bin": "dist/cli.js",
+  "bin": {
+    "harness": "./dist/cli.js"
+  },
   "main": "dist/auditor.js",
   "types": "dist/auditor.d.ts",
   "exports": {
@@ -30,7 +32,8 @@
     "typescript": "^5.5.0"
   },
   "files": [
-    "dist/"
+    "dist/",
+    "README.md"
   ],
   "repository": {
     "type": "git",

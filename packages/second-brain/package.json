@@ -1,9 +1,15 @@
 {
   "name": "@rulebased/second-brain",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Second brain tools for Claude Code — init, capture, connect, review, organize, synthesize, search, daily, refactor, reference-check, glossary-sync",
   "type": "module",
   "license": "MIT",
+  "files": [
+    "skills/",
+    "commands/",
+    "scaffold/",
+    "docs/"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/rulebased-io/claude-plugin"

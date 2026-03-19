@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "rulebased",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Claude Code plugins by rulebased.io",
   "owner": {
     "name": "rulebased.io",
@@ -13,7 +13,7 @@
       "name": "rulebased-harness",
       "description": "Harness audit, score, init, recommend, and eval-log for AI agent projects",
       "source": "./packages/harness",
-      "version": "1.4.3",
+      "version": "1.4.4",
       "category": "development",
       "author": {
         "name": "rulebased.io",
@@ -24,7 +24,7 @@
       "name": "rulebased-second-brain",
       "description": "Second brain tools — init, capture, connect, review, organize, synthesize, search, daily, refactor, reference-check, glossary-sync",
       "source": "./packages/second-brain",
-      "version": "0.7.0",
+      "version": "0.7.1",
       "category": "productivity",
       "author": {
         "name": "rulebased.io",
