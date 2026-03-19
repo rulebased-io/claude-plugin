@@ -1,6 +1,6 @@
 {
   "name": "@rulebased/harness",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Harness engineering tools for AI agents — audit, init, recommend, eval-log",
   "type": "module",
   "bin": {
