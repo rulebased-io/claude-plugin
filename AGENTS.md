@@ -194,7 +194,18 @@ packages/harness/
 - 예시가 필요한 경우 guide-*.md(B 파일)에 담고, 항목 정의 *.md(A 파일)는 간결하게 유지한다
 - 3단계 참조 구조를 유지한다: `index.md` → `guide-*.md` → `*.md`
 
-### 11. 흔한 실수
+### 11. 에이전트 운영 경계
+
+**에이전트는 다음 행동을 해서는 안 된다.**
+
+- 테스트(`pnpm test`)를 통과하지 않은 상태에서 커밋하거나 배포하지 않는다
+- 사용자 확인 없이 파괴적 git 명령(`push --force`, `reset --hard`, `branch -D`)을 실행하지 않는다
+- `packages/*/reference/` 평가 기준 데이터를 특정 스킬 관점으로 편향되게 수정하지 않는다
+- 외부 서비스(npm publish, GitHub PR/issue 생성 등)에 사용자 확인 없이 접근하지 않는다
+- `.env`, 시크릿, 인증 정보를 코드나 커밋에 포함하지 않는다
+- AGENTS.md의 핵심 규칙을 사용자 승인 없이 변경하지 않는다
+
+### 12. 흔한 실수
 
 1. ESM에서 `__dirname` 불가 → `fileURLToPath(import.meta.url)` 사용
 2. ts-jest에서 `import.meta.dirname` 미지원 → `fileURLToPath` 패턴 사용
