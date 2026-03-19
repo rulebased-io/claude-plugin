@@ -29,8 +29,8 @@ Get the synthesis topic from the user. It can be:
 2. **Present candidates** for user confirmation:
    ```
    Found 8 notes related to "distributed systems":
-   1. notes/cap-theorem.md (tags: #distributed #theory)
-   2. notes/redis-patterns.md (tags: #caching #distributed)
+   1. resources/cap-theorem.md (tags: #distributed #theory)
+   2. resources/redis-patterns.md (tags: #caching #distributed)
    3. inbox/eventual-consistency-thought.md
    ...
    Include all? Or select specific notes? [all / select]
@@ -46,17 +46,18 @@ For each source note:
 
 ### Step 4: Create Synthesis Note
 
-Generate in `notes/` (or `maps/` if overview):
+Read AGENTS.md to determine the appropriate folder. Generate:
 
 ```markdown
 ---
 title: "Synthesis: <topic>"
-created: <ISO 8601>
-updated: <ISO 8601>
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
 tags: [synthesis, <topic-tags>]
-status: active
-sources:
-  - <source-paths>
+status: budding
+related:
+  - "[[source-note-1]]"
+  - "[[source-note-2]]"
 ---
 
 # <Topic>
@@ -83,12 +84,12 @@ sources:
 
 For each source note:
 - Add a wiki-link back to the synthesis: `[[synthesis-topic]]`
-- Add to `links` frontmatter if not already there
+- Add to `related` frontmatter if not already there
 
 ### Step 6: Confirm
 
 ```
-Synthesis created → notes/synthesis-distributed-systems.md
+Synthesis created → resources/synthesis-distributed-systems.md
 Sources: 8 notes referenced
 Themes: 3 identified
 Open questions: 2 flagged
@@ -102,5 +103,6 @@ Open questions: 2 flagged
 - Flag contradictions explicitly rather than silently resolving them.
 - If fewer than 2 source notes found, suggest capturing more first.
 - Keep synthesis concise. Quality over length.
+- Follow `system/conventions.md` for frontmatter and maturity model.
 
 $ARGUMENTS

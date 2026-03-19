@@ -15,17 +15,16 @@ Scan notes for new terms and sync them into the glossary.
 
 ### Step 1: Locate Glossary
 
-1. Check `system/glossary.md` (scaffold default)
-2. If not found, glob for `**/glossary.md`
-3. If no glossary exists, propose creating `system/glossary.md` with the scaffold format:
+1. Glob for `**/glossary.md` in the brain
+2. If no glossary exists, propose creating `resources/glossary.md`:
 
 ```markdown
 ---
 title: Glossary
 created: {date}
 updated: {date}
-tags: [system]
-type: glossary
+tags: [glossary, reference]
+type: reference
 ---
 
 # Glossary
@@ -64,7 +63,7 @@ Exclude from scanning:
 Scan target files for term candidates:
 
 **Include** — terms worth adding:
-- Domain-specific concepts (e.g., "Zettelkasten", "Spaced Repetition", "Transit Schema")
+- Domain-specific concepts (e.g., "Zettelkasten", "Spaced Repetition")
 - Project-specific abbreviations or acronyms with special meaning
 - Words used with a specific meaning different from common usage
 - Technical terms that appear 2+ times across different notes

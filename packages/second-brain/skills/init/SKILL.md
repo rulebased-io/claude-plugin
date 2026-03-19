@@ -1,79 +1,43 @@
 ---
 name: init
-description: Initialize a second brain directory structure with scaffold templates, system files, and workspace layout. Use when starting a new second brain from scratch.
+description: Initialize a second brain directory structure from scaffold templates. Use when starting a new second brain from scratch.
 ---
 
-Initializes a second brain directory structure in the current working directory.
+Initialize a second brain directory structure in the current working directory.
 
 The `CLAUDE_PLUGIN_PATH` provided by the hook is this plugin's root. The scaffold templates are at `${CLAUDE_PLUGIN_PATH}/scaffold/`.
 
-## Phase 1: Scaffold
+## Procedure
 
-Read the scaffold directory at `${CLAUDE_PLUGIN_PATH}/scaffold/` and recreate the structure in CWD.
+### Phase 1: Scaffold
 
-**디렉토리 구조**:
-```
-<brain-root>/
-├── BRAIN.md              # 외부 에이전트 접근 정책, Permission Set
-├── AGENTS.md             # Agent 역할 정의, 작업 흐름
-├── CLAUDE.md             # AGENTS.md, rules.md 참조
-├── system/               # 규칙, 스키마, 용어집, 템플릿
-│   ├── rules.md
-│   ├── standard-schema.md  # Transit/Storage Schema 정의
-│   ├── design-principles.md
-│   ├── glossary.md
-│   ├── MOC-index.md
-│   └── templates/        # note, idea, journal, snippet, til
-├── inbox/                # 빠른 캡처, 외부 유입
-│   └── README.md         # inbox 운영 가이드
-├── workspace/            # 직접 작업 공통 루트
-│   ├── README.md         # workspace 구조 가이드
-│   ├── knowledge/        # memos, readings
-│   ├── code/             # snippets, til
-│   ├── projects/
-│   └── resources/
-├── ideas/                # 아이디어 스테이징 (seed→growing→ripe)
-│   └── README.md         # 아이디어 생명주기 가이드
-├── journal/              # 일기, 회고
-├── areas/                # 지속 관리 영역
-│   └── profile.md        # 개인 프로필 템플릿
-├── archives/             # 비활성 보관
-└── brains/               # Permission Set 템플릿
-    ├── README.md         # Permission Set 운영 가이드
-    ├── mentor-session/   # 멘토링 세션 Permission Set
-    └── project-collab/   # 프로젝트 협업 Permission Set
-```
-
-**절차**:
-1. Read each file from `${CLAUDE_PLUGIN_PATH}/scaffold/`
-2. Replace `{{OWNER_NAME}}` with user's name (ask if not known)
-3. Replace `{{DATE}}` with today's date (YYYY-MM-DD)
-4. Create directories and files in CWD
+1. Read the entire scaffold directory at `${CLAUDE_PLUGIN_PATH}/scaffold/`
+2. Recreate the same directory structure and files in CWD
+3. Replace `{{OWNER_NAME}}` with user's name (ask if not known)
+4. Replace `{{DATE}}` with today's date (YYYY-MM-DD)
 5. Skip existing files — never overwrite
 
-## Phase 2: Reconciliation
+Do NOT hardcode the directory tree. Read the scaffold directory to determine what to create.
 
-구조 생성 후, CWD 내 기존 자산을 탐색하여 마이그레이션 후보를 제시한다.
+### Phase 2: Reconciliation
 
-**탐색 대상**:
-- `notes/`, `daily/`, `maps/` — 기존 second-brain 스킬 스펙 구조
-- `*.md` 파일 (루트) — 기존 파일
-- `templates/` — 기존 템플릿
+After creating the structure, scan CWD for existing markdown assets:
 
-**절차**:
-1. 발견된 파일 목록을 사용자에게 보여준다
-2. 기존 구조와 새 구조의 매핑을 제안한다:
-   - `notes/` → `workspace/knowledge/`
-   - `daily/` → `journal/`
-   - `maps/` → `system/` (MOC)
-   - `inbox/` → `inbox/` (유지)
-3. 승인된 항목만 이동. 원본은 보존한다
+1. Glob `*.md` files and any existing directories not created by the scaffold
+2. Read the Structure table in the newly created `AGENTS.md` to understand folder purposes
+3. Suggest migration mappings (e.g., existing `notes/` → `resources/`)
+4. Move only user-approved items. Preserve originals.
 
-## Phase 3: Hollow Check
+### Phase 3: Hollow Check
 
-빈 구조를 경고한다:
-- "BRAIN.md가 생성되었지만 `{{OWNER_NAME}}`이 아직 설정되지 않았습니다."
-- "system/rules.md가 기본 템플릿 상태입니다. 프로젝트에 맞게 수정하세요."
-- "workspace/가 비어 있습니다."
+Warn about unfilled placeholders:
+- Files still containing `{{OWNER_NAME}}`
+- Empty folders with only README.md
+
+## Rules
+
+- Never overwrite existing files.
+- Always ask for `{{OWNER_NAME}}` if not provided via arguments.
+- The scaffold is the single source of truth for structure — do not invent folders.
 
 $ARGUMENTS

@@ -1,6 +1,6 @@
 ---
 name: refactor
-description: Split large notes, merge small notes, and move notes between folders
+description: Split large notes into atomic pieces or merge small related notes. Update all wiki-links after restructuring. Use when notes have grown too large or are too fragmented.
 type: skill
 created: 2026-03-19
 ---
@@ -11,11 +11,13 @@ Reshape notes to maintain atomic note principles.
 
 - A note has grown too large (500+ lines)
 - Multiple small notes cover the same topic
-- Moving notes between folders (inbox → notes, notes → archive)
+- Moving notes between folders
 - Reorganizing after a connect or organize session
 - `/rulebased-second-brain:refactor` invoked
 
 ## Procedure
+
+Read `AGENTS.md` Structure table for folder locations and `system/conventions.md` for frontmatter rules before proceeding.
 
 ### Mode 1: Split a Large Note
 
@@ -24,20 +26,20 @@ Reshape notes to maintain atomic note principles.
 3. **Propose split plan**:
    ```
    Split "system-design-notes.md" (450 lines) into:
-   1. notes/load-balancing.md — lines 1-120
-   2. notes/database-sharding.md — lines 121-280
-   3. notes/caching-layers.md — lines 281-400
-   4. notes/system-design-overview.md — lines 401-450 (MOC)
+   1. load-balancing.md — lines 1-120
+   2. database-sharding.md — lines 121-280
+   3. caching-layers.md — lines 281-400
+   4. system-design-overview.md — lines 401-450 (MOC)
    Proceed? [yes / adjust / cancel]
    ```
 4. **Execute split**:
-   - Create each new note with proper frontmatter
+   - Create each new note with frontmatter per `system/conventions.md`
    - Inherit tags from the original
    - `created` = original's `created`, `updated` = now
-   - Add cross-links between all split notes
+   - Add cross-links between all split notes via `related` field
    - Create a summary/MOC note if 3+ pieces
 5. **Update references**: find all `[[wiki-links]]` to original → update to most relevant split note
-6. **Handle original**: move to `archive/` with redirect note
+6. **Handle original**: move to `archives/` with redirect note
 
 ### Mode 2: Merge Small Notes
 
@@ -56,14 +58,13 @@ Reshape notes to maintain atomic note principles.
 
 ### Mode 3: Move / Promote
 
-| Action | From | To | Status change |
-|--------|------|----|--------------|
-| promote | inbox/ | notes/ | inbox → active |
-| archive | notes/ | archive/ | active → archive |
-| to-moc | notes/ | maps/ | unchanged |
-| restore | archive/ | notes/ | archive → active |
+Read AGENTS.md to determine valid destination folders. Common moves:
 
-Update all references and frontmatter after move.
+- `inbox/` → content folder (promote from capture to organized)
+- Any folder → `archives/` (archive inactive content)
+- Between content folders (reclassify)
+
+Update all references, `related` fields, and frontmatter after move.
 
 ## Rules
 
@@ -73,5 +74,6 @@ Update all references and frontmatter after move.
 - Show a clear before/after plan and get user approval before executing.
 - Preserve original `created` dates. Only update `updated`.
 - If a split creates a note < 10 lines, warn that it might be too small.
+- Use folder paths from AGENTS.md, not hardcoded paths.
 
 $ARGUMENTS

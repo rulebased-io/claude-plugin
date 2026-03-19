@@ -1,6 +1,6 @@
 {
   "name": "rulebased-plugin",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "private": true,
   "description": "Claude Code plugins by rulebased.io",
   "scripts": {

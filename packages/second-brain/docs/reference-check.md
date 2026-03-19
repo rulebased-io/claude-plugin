@@ -1,6 +1,6 @@
 ---
 name: reference-check
-description: Scan for broken wikilinks and path references, suggest and execute fixes
+description: Scan all markdown files for broken wikilinks and path references, suggest and execute fixes. Use after file moves, renames, or deletions.
 type: skill
 created: 2026-03-19
 ---
@@ -67,12 +67,12 @@ Scan for patterns like `` `path/to/file.md` ``, `` `folder/` ``, `` `./relative/
 #### Wikilinks ({count})
 | File | Line | Broken Reference | Suggestion |
 |------|------|-----------------|------------|
-| `file.md` | 42 | `[[old-name]]` | → `[[new-name]]` (moved to workspace/knowledge/) |
+| `file.md` | 42 | `[[old-name]]` | → `[[new-name]]` (found in resources/) |
 
 #### Path References ({count})
 | File | Line | Broken Path | Suggestion |
 |------|------|-------------|------------|
-| `README.md` | 15 | `notes/permanent/` | → `workspace/knowledge/` |
+| `AGENTS.md` | 15 | `old-folder/` | → `resources/` |
 
 ### Summary
 Total: {N} broken references. Wikilinks: {A}, Paths: {B}.

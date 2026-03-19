@@ -23,41 +23,28 @@ Ask or detect from arguments:
 
 ### Step 2: Create or Open Daily Note
 
-Filename: `daily/YYYY-MM-DD.md`
+Read AGENTS.md to find the journal folder. Create the file as `<journal-folder>/YYYY-MM-DD.md`.
 
-If it doesn't exist, create from template:
+If it doesn't exist, use `templates/journal.md` if available. Otherwise create with frontmatter per `system/conventions.md`:
 
 ```markdown
 ---
-title: <YYYY-MM-DD Day-of-Week>
-created: <ISO 8601>
-updated: <ISO 8601>
-tags: [daily]
-status: active
+created: YYYY-MM-DD
+tags: [journal]
+type: journal
+mood:
+energy:
 ---
 
-# <YYYY-MM-DD Day-of-Week>
+# YYYY-MM-DD
 
-## Captures
-<!-- Quick thoughts throughout the day -->
+## Done today
 
+## Learned
 
-## Tasks
-<!-- Things to do today -->
-- [ ]
-
-
-## Notes
-<!-- Longer form thoughts -->
-
-
-## Review
-<!-- Notes resurfaced today -->
-
+## Tomorrow
 
 ## Reflection
-<!-- End of day reflection -->
-
 ```
 
 If it exists, open and show current content.
@@ -67,7 +54,7 @@ If it exists, open and show current content.
 If morning mode:
 
 1. **Show inbox count**: how many items in `inbox/`
-2. **Surface review notes** (2-3 notes): pick from notes not reviewed in the longest time, add to daily note's Review section
+2. **Surface review notes** (2-3 notes): pick from notes not reviewed in the longest time, add to daily note
 3. **Show yesterday's unfinished tasks**: find unchecked `- [ ]` items, offer to carry forward
 4. **Recent captures**: show items added to inbox in the last 24 hours
 
@@ -92,10 +79,9 @@ If evening mode:
 ## Rules
 
 - One daily note per day. Never create duplicates.
-- Daily notes live in `daily/` folder only.
-- If `daily/` doesn't exist, create it.
-- If templates exist in `templates/daily.md`, use that instead of the default.
+- If the journal folder doesn't exist, create it.
 - Keep the routine fast — the daily note is a launchpad, not a blocker.
 - Unfinished tasks should be offered for carry-forward, never silently dropped.
+- Use folder paths from AGENTS.md, not hardcoded paths.
 
 $ARGUMENTS

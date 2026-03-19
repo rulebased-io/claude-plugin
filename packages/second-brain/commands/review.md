@@ -7,6 +7,7 @@ Bring old notes back to attention for review, update, or archival.
 
 Modes: inbox (oldest first), random (prefer 30+ days unreviewed), oldest (missing `reviewed` first), tag-based.
 Per-note actions: keep, update, connect, archive, skip. Inbox adds: promote, merge.
-Presents notes one at a time. Always updates `reviewed` timestamp.
+Evaluates maturity promotion (seedling → budding → evergreen) per `system/conventions.md`.
+Presents notes one at a time. Always updates `reviewed` date.
 
 $ARGUMENTS
