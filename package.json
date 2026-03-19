@@ -1,6 +1,6 @@
 {
   "name": "rulebased-plugin",
-  "version": "1.4.7",
+  "version": "1.4.9",
   "private": true,
   "description": "Claude Code plugins by rulebased.io",
   "scripts": {
@@ -8,7 +8,11 @@
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
     "dev": "pnpm --filter @rulebased/harness dev",
-    "audit:harness": "pnpm --filter @rulebased/harness dev -- audit"
+    "audit:harness": "pnpm --filter @rulebased/harness dev -- audit",
+    "prepublish:check": "pnpm run build && pnpm test && cd packages/harness && npm pack --dry-run && cd ../second-brain && npm pack --dry-run",
+    "publish:harness": "cd packages/harness && npm publish",
+    "publish:second-brain": "cd packages/second-brain && npm publish",
+    "publish:all": "pnpm run publish:harness && pnpm run publish:second-brain"
   },
   "engines": {
     "node": ">=18.0.0",

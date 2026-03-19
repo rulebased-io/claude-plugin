@@ -1,7 +1,7 @@
 {
   "name": "rulebased-second-brain",
   "description": "Second brain tools for Claude Code — init, capture, connect, review, organize, synthesize, search, daily, refactor, reference-check, glossary-sync",
-  "version": "0.7.2",
+  "version": "0.7.4",
   "author": {
     "name": "rulebased.io"
   },

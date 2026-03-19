@@ -12,7 +12,7 @@
 
 AI 에이전트를 위한 하네스 구축 도구. 프로젝트의 하네스 엔지니어링 구축 정도를 평가하고, 빠진 요소를 추천하고, 자동으로 생성합니다.
 
-> **하네스 엔지니어링** = 에이전트의 행동을 제약(Constraints)하고, 컨텍스트(Context)를 제공하고, 결과를 평가(Eval)하는 시스템 설계. [OpenAI Harness Engineering](https://openai.com/index/harness-engineering/) 참고.
+> **하네스 엔지니어링** = 에이전트의 행동을 제약(Constraints)하고, 컨텍스트(Context)를 제공하고, 결과를 평가(Eval)하는 시스템 설계. [OpenAI](https://openai.com/index/harness-engineering/), [Anthropic](https://www.anthropic.com/engineering/claude-code-best-practices), [GitHub](https://github.blog/changelog/2025-06-06-best-practices-for-using-copilot-coding-agent/), [Stripe](https://stripe.com/blog/minions-stripes-coding-agents), [Martin Fowler](https://martinfowler.com/articles/harness-engineering.html) 등의 베스트 프랙티스 기반.
 
 ### @rulebased/second-brain
 
@@ -82,7 +82,7 @@ npx @rulebased/harness eval-log
 
 ### harness-audit
 
-[OpenAI Codex 하네스 기준](https://openai.com/index/unlocking-the-codex-harness/)에 따라 36개 항목을 검사하고 0-100 점수를 매깁니다.
+업계 베스트 프랙티스(OpenAI, Anthropic, GitHub, Stripe, Google, Martin Fowler, Vercel 등)를 종합하여 36개 항목을 검사하고 0-100 점수를 매깁니다.
 
 **점검 카테고리:**
 
@@ -231,11 +231,11 @@ pnpm test          # 26개 테스트
 ## 로드맵
 
 - [x] npm 배포 — `@rulebased/harness`
+- [x] npm 배포 — `@rulebased/second-brain`
 - [ ] 온보딩 위자드 — 프로젝트 타입별 대화형 세팅 (frontend, backend, fullstack)
 - [ ] 내장 템플릿 — 타입별 AGENTS.md, 훅, audit 프리셋
 - [ ] 하네스 가져오기 — 다른 프로젝트의 하네스를 비교 후 적용
 - [ ] 멀티 에이전트 플러그인 — Codex, Cursor 지원
-- [ ] npm 배포 — `@rulebased/second-brain`
 
 ## 라이선스
 

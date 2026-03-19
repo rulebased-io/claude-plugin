@@ -2,7 +2,7 @@
 
 A harness-building tool for AI agents. Assess how well your project's harness engineering is set up, get recommendations for missing elements, and auto-generate them.
 
-> **Harness Engineering** = A system design approach that constrains agent behavior (Constraints), provides context (Context), and evaluates results (Eval). See [OpenAI Harness Engineering](https://openai.com/index/harness-engineering/).
+> **Harness Engineering** = A system design approach that constrains agent behavior (Constraints), provides context (Context), and evaluates results (Eval). Based on practices from [OpenAI](https://openai.com/index/harness-engineering/), [Anthropic](https://www.anthropic.com/engineering/claude-code-best-practices), [GitHub](https://github.blog/changelog/2025-06-06-best-practices-for-using-copilot-coding-agent/), [Stripe](https://stripe.com/blog/minions-stripes-coding-agents), [Martin Fowler](https://martinfowler.com/articles/harness-engineering.html), and more.
 
 ## Installation
 
@@ -43,7 +43,7 @@ After installation, the following slash commands are available:
 
 ### audit
 
-Checks 36 items based on [OpenAI Codex harness standards](https://openai.com/index/unlocking-the-codex-harness/) and assigns a score from 0 to 100.
+Checks 36 items derived from industry best practices (OpenAI, Anthropic, GitHub, Stripe, Google, Martin Fowler, Vercel, and others) and assigns a score from 0 to 100.
 
 | Category | Items Checked |
 |----------|---------------|
