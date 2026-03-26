@@ -190,7 +190,9 @@ User: "rulebased:researcher에게 이 패턴에 대한 노트 있는지 물어�
 → Skill internally:
    1. Check server running → curl localhost:9100/health
    2. POST /messages {"to": "rulebased:researcher", "content": "..."}
-   3. Wait for sync response (timeout: 120s)
+      → 즉시 200 { "messageId": "xxx" } (fire-and-forget)
+   3. Poll GET /messages/inbox?peerId={myPeerId} for response
+      → Agent A's client receives routed response via polling
    4. Display response to user
 ```
 
@@ -217,7 +219,9 @@ User: "어떤 에이전트들이 있어?"
 
 ### Phase 1 (MVP)
 
-- Synchronous ask/response (HTTP wait for delegate response)
+- Asynchronous fire-and-forget messaging with polling-based delivery
+- Server as pure message router (queue + inbox per peer)
+- Skill polls agent client for responses
 - Localhost trust, no authentication
 - Offline = fail with message ("Agent is offline")
 - Single machine, local server only
@@ -225,8 +229,7 @@ User: "어떤 에이전트들이 있어?"
 
 ### Phase 2
 
-- Async polling (POST → poll status → receive response)
-- Offline message queuing (server stores, delivers when online)
+- Offline message queuing (server stores, delivers when agent comes online)
 - Conversation sessions (multi-turn context between agents)
 
 ### Phase 3
@@ -282,24 +285,43 @@ POST /unregister
 → 200 { "unregistered": ["my-project:researcher"] }
 ```
 
-### Messaging
+### Messaging (Fire-and-Forget + Polling)
+
+The server is a pure message router. `POST /messages` queues the message and returns immediately. Both sending and receiving happen through agent client polling.
 
 ```
 POST /messages
 { "from": "my-app:user", "to": "rulebased:researcher", "content": "질문 내용" }
-→ 200 { "response": "대리자의 응답 내용" }  (sync, blocks until delegate responds)
+→ 200 { "messageId": "uuid" }  (immediate ack, message queued for target agent)
 → 404 { "error": "agent_not_found", "message": "rulebased:researcher not registered" }
 → 503 { "error": "agent_offline", "message": "rulebased:researcher is offline" }
-→ 504 { "error": "timeout", "message": "Delegate did not respond within 120s" }
+
+GET /messages/inbox?peerId={peerId}
+→ 200 { "messages": [{ "messageId": "...", "from": "...", "agentName": "...", "content": "...", "replyTo": null, "timestamp": ... }] }
+(Agent polls this to receive incoming messages. Includes both questions and responses.)
+
+POST /messages/ack
+{ "messageIds": ["uuid1", "uuid2"] }
+→ 200 { "acknowledged": 2 }
+(Agent acknowledges processed messages so they are removed from inbox.)
 ```
+
+Message flow:
+1. Agent A skill: `POST /messages` → immediate ack with messageId
+2. Server queues message in Agent B's inbox
+3. Agent B client polls `/messages/inbox` → receives message
+4. Agent B delegate generates response
+5. Agent B client: `POST /messages` with `replyTo: messageId` → queued in Agent A's inbox
+6. Agent A client polls `/messages/inbox` → receives response
+7. Skill displays response to user
 
 ## Error Handling
 
 | Scenario | Behavior |
 |----------|----------|
 | Target agent not found | 404 — "Agent not registered" |
-| Target agent offline | 503 — "Agent is offline" (Phase 1: no queuing) |
-| Delegate response timeout (120s) | 504 — "Delegate did not respond in time" |
+| Target agent offline | 503 — "Agent is offline" |
+| Response not received (skill timeout) | Skill polls for response; after timeout shows "응답 대기 중. 나중에 status로 확인하세요." |
 | Server not running | Skill detects via health check failure, prompts user to run `:online` |
 | Server port in use | Server startup fails with clear error, suggest alternative port |
 | Duplicate project name | First-come-first-served; second registration gets error with suggestion to rename |
