@@ -29,35 +29,35 @@ Currently, Claude Code sessions operate in isolation within a single project dir
 ### System Diagram
 
 ```
-[Repo A: Claude Code]                                      [Repo B: Claude Code]
-       │                                                           │
-  /rulebased-agents:ask                                            │
-  "rulebased:researcher" "질문"                                     │
-       │                                                           │
-  curl POST localhost:9100/messages                                │
-       │                                                           │
-       ▼                                                           │
-┌──────────────────────┐                                           │
-│   Agents Server      │                                           │
-│  (localhost:9100)    │                                           │
-│                      │         WS push                           │
-│  - Peer registry     │──────────────────────────▶ [Local Agent B]│
-│  - Message routing   │                            │              │
-│  - Agent directory   │                            ▼              │
-│                      │                     Load delegate def     │
-│                      │                     researcher.md         │
-│                      │                            │              │
-│                      │                     Spawn delegate        │
-│                      │                     (sandboxed response)  │
-│                      │         WS response        │              │
-│                      │◀──────────────────────────┘              │
-└──────────┬───────────┘                                           │
-           │                                                       │
-     Response returned                                             │
-     (sync HTTP)                                                   │
-           │                                                       │
-           ▼                                                       │
-  Response displayed to user                                       │
+[Repo A: Claude Code]                            [Repo B: Local Agent]
+       │                                                  │
+  /rulebased-agents:ask                            (detached process,
+  "rulebased:researcher" "질문"                     polling server)
+       │                                                  │
+  curl POST localhost:9100/messages                       │
+       │                                                  │
+       ▼                                                  │
+┌──────────────────────┐                                  │
+│   Agents Server      │                                  │
+│  (localhost:9100)    │      Server routes message        │
+│                      │      to Local Agent B             │
+│  - Peer registry     │─────────────────────────▶ Message received
+│  - Message routing   │                           │
+│  - Agent directory   │                           ▼
+│                      │                    Load delegate def
+│                      │                    researcher.md
+│                      │                           │
+│                      │                    Spawn delegate
+│                      │                    (sandboxed response)
+│                      │       HTTP response       │
+│                      │◀─────────────────────────┘
+└──────────┬───────────┘
+           │
+     Response returned
+     (sync HTTP)
+           │
+           ▼
+  Response displayed to user
 ```
 
 ### Address Scheme
@@ -126,7 +126,8 @@ After `/rulebased-agents:init my-project`:
 ├── config.json          # Project name, server port, etc.
 ├── delegates/           # Delegate definition files
 │   └── researcher.md    # (created via :create skill)
-└── outbox/              # Unsent messages when offline (future)
+├── logs/                # agent.log, server.log (when detached)
+└── outbox/              # Unsent messages when offline (Phase 2+)
 ```
 
 ```json
@@ -235,10 +236,86 @@ User: "어떤 에이전트들이 있어?"
 - Agent capability negotiation
 - Message history and audit trail
 
+## Delegate Execution Model
+
+The delegate execution mechanism is intentionally left open for Phase 1 prototyping. Possible approaches include:
+
+- Invoking `claude` CLI with the delegate `.md` as system prompt and the incoming message as user input
+- Direct LLM API call with delegate definition as context
+- A lightweight script runner that reads the delegate definition and generates responses
+
+The chosen approach must satisfy these constraints:
+- The delegate runs within the repo directory (`--cwd`)
+- The delegate's file access is scoped by its definition (enforced by instruction, not filesystem)
+- The delegate's response is captured as text and returned to the server
+
+This will be resolved during Phase 1 implementation through prototyping.
+
+## Server API (Phase 1)
+
+### Health Check
+
+```
+GET /health
+→ 200 { "status": "ok", "uptime": 1234, "peers": 2 }
+```
+
+### Agent Directory
+
+```
+GET /agents
+→ 200 [{ "id": "project:agent", "description": "...", "status": "online" }]
+
+GET /agents?project=rulebased
+→ 200 (filtered by project)
+```
+
+### Peer Registration
+
+```
+POST /register
+{ "project": "my-project", "agents": [{ "name": "researcher", "description": "..." }] }
+→ 200 { "peerId": "...", "registered": ["my-project:researcher"] }
+
+POST /unregister
+{ "peerId": "..." }
+→ 200 { "unregistered": ["my-project:researcher"] }
+```
+
+### Messaging
+
+```
+POST /messages
+{ "from": "my-app:user", "to": "rulebased:researcher", "content": "질문 내용" }
+→ 200 { "response": "대리자의 응답 내용" }  (sync, blocks until delegate responds)
+→ 404 { "error": "agent_not_found", "message": "rulebased:researcher not registered" }
+→ 503 { "error": "agent_offline", "message": "rulebased:researcher is offline" }
+→ 504 { "error": "timeout", "message": "Delegate did not respond within 120s" }
+```
+
+## Error Handling
+
+| Scenario | Behavior |
+|----------|----------|
+| Target agent not found | 404 — "Agent not registered" |
+| Target agent offline | 503 — "Agent is offline" (Phase 1: no queuing) |
+| Delegate response timeout (120s) | 504 — "Delegate did not respond in time" |
+| Server not running | Skill detects via health check failure, prompts user to run `:online` |
+| Server port in use | Server startup fails with clear error, suggest alternative port |
+| Duplicate project name | First-come-first-served; second registration gets error with suggestion to rename |
+| Malformed delegate `.md` | Local agent logs warning, skips registration of that delegate |
+| Server crash mid-request | Client receives connection error, skill reports "Server unavailable" |
+
+## Logging
+
+- Server logs: stdout (visible when running in foreground) or `.rulebased/agents/server.log` (when detached)
+- Local agent logs: `.rulebased/agents/agent.log`
+- `:status` skill shows recent log entries for debugging
+
 ## Technical Constraints
 
-- No external runtime dependencies (Node.js built-in modules only for core)
-- WebSocket: `ws` package (or Node.js built-in if available)
-- HTTP server: Node.js built-in `http` module
+- Phase 1: HTTP only (no WebSocket). Server uses Node.js built-in `http` module. Local agent polls or uses HTTP long-polling for message reception. WebSocket upgrades in Phase 2 for real-time push.
+- No external runtime dependencies for Phase 1 (Node.js built-in modules only)
+- Phase 2+: `ws` package for WebSocket support (explicit exception to zero-dependency rule, documented)
 - ESM, strict TypeScript, no `any`
 - Tests in `tests/` directory, fixture-based
