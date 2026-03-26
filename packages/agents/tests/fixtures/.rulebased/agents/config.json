@@ -1,0 +1,6 @@
+{
+  "project": "test-project",
+  "server": {
+    "port": 9100
+  }
+}
