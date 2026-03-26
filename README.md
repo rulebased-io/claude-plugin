@@ -20,6 +20,10 @@ A personal knowledge management tool. Initialize a structured second brain, capt
 
 > Based on PKM methodologies: PARA, CODE (Capture→Organize→Distill→Express), Zettelkasten, MOC, and Spaced Repetition.
 
+### @rulebased/agents
+
+Cross-repo AI agent communication for Claude Code. Enable Claude Code sessions in different repositories to discover and delegate tasks to each other via a lightweight local message broker.
+
 ---
 
 ## Installation
@@ -35,6 +39,7 @@ A personal knowledge management tool. Initialize a structured second brain, capt
 # Step 2: Install a plugin
 /plugin install rulebased-harness@rulebased
 /plugin install rulebased-second-brain@rulebased
+/plugin install rulebased-agents@rulebased
 ```
 
 2. Or test locally during development:
@@ -42,6 +47,7 @@ A personal knowledge management tool. Initialize a structured second brain, capt
 ```bash
 claude --plugin-dir ./packages/harness
 claude --plugin-dir ./packages/second-brain
+claude --plugin-dir ./packages/agents
 ```
 
 ### skills.sh
@@ -187,6 +193,20 @@ Scaffolds a PARA-based second brain structure:
 
 ---
 
+## Agents Skills
+
+```
+/rulebased-agents:init    # Initialize .rulebased/agents/ structure
+/rulebased-agents:create  # Create a new delegate agent definition
+/rulebased-agents:online  # Start server and register delegates
+/rulebased-agents:offline # Disconnect and unregister delegates
+/rulebased-agents:ask     # Send a question to a remote agent
+/rulebased-agents:list    # List all registered agents
+/rulebased-agents:status  # Show server and agent connection status
+```
+
+---
+
 ## Scoring System (Harness)
 
 | Severity | Weight | Examples |
@@ -210,11 +230,16 @@ rulebased-plugin (pnpm monorepo)
 │   │   ├── reference/           # Evaluation criteria
 │   │   ├── src/                 # Auditor, recommender, initializer, CLI
 │   │   └── tests/               # Tests + fixtures
-│   └── second-brain/            # @rulebased/second-brain - PKM tools
-│       ├── skills/              # 11 skills (init, capture, connect, ...)
+│   ├── second-brain/            # @rulebased/second-brain - PKM tools
+│   │   ├── skills/              # 11 skills (init, capture, connect, ...)
+│   │   ├── commands/            # Claude Code commands
+│   │   ├── scaffold/            # Init templates and structure
+│   │   └── docs/                # Shared documentation
+│   └── agents/                  # @rulebased/agents - cross-repo communication
+│       ├── skills/              # 7 skills (init, create, online, offline, ask, list, status)
 │       ├── commands/            # Claude Code commands
-│       ├── scaffold/            # Init templates and structure
-│       └── docs/                # Shared documentation
+│       ├── hooks/               # Plugin hooks
+│       └── src/                 # Server, local agent, delegate loader, CLI
 ├── specs/                       # Spec workflow (todo/done/backlog)
 ├── tasks/                       # Task workflow (todo/done)
 └── docs/                        # Documentation
