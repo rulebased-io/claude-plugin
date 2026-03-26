@@ -3,6 +3,7 @@ import { createLocalAgent } from "../src/agent.js";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Server } from "node:http";
+import type { InboxMessage } from "../src/types.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const fixturesDir = join(__dirname, "fixtures");
@@ -27,7 +28,6 @@ describe("agent", () => {
       project: "test",
       delegatesDir: join(fixturesDir, "delegates"),
       delegateRunner: async (_name, _body, content) => `Echo: ${content}`,
-      pollIntervalMs: 100,
     });
 
     const res = await fetch(`http://localhost:${port}/agents`);
@@ -38,8 +38,8 @@ describe("agent", () => {
     await agent.shutdown();
   });
 
-  it("should process incoming messages and send responses via replyTo", async () => {
-    // Register sender peer so it has an inbox for the response
+  it("should process incoming messages via SSE and send responses via replyTo", async () => {
+    // Register sender peer so it can receive the response
     const senderReg = await fetch(`http://localhost:${port}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -47,12 +47,22 @@ describe("agent", () => {
     });
     const { peerId: senderPeerId } = await senderReg.json();
 
+    // Subscribe sender to SSE so we can read the response
+    const abortController = new AbortController();
+    const sseRes = await fetch(`http://localhost:${port}/messages/subscribe?peerId=${senderPeerId}`, {
+      signal: abortController.signal,
+    });
+    const reader = sseRes.body!.getReader();
+    const decoder = new TextDecoder();
+    // Skip initial ":ok"
+    await reader.read();
+
+    // Create agent (will auto-subscribe to SSE)
     const agent = await createLocalAgent({
       serverUrl: `http://localhost:${port}`,
       project: "test",
       delegatesDir: join(fixturesDir, "delegates"),
       delegateRunner: async (_name, _body, content) => `Response to: ${content}`,
-      pollIntervalMs: 100,
     });
 
     // Send message to test:researcher
@@ -68,18 +78,15 @@ describe("agent", () => {
     const { messageId } = await msgRes.json();
     expect(msgRes.status).toBe(200);
 
-    // Wait for agent polling to process and respond
-    await new Promise((r) => setTimeout(r, 500));
-
-    // Check sender's inbox for the response
-    const inboxRes = await fetch(`http://localhost:${port}/messages/inbox?peerId=${senderPeerId}`);
-    const { messages } = await inboxRes.json();
-    expect(messages.length).toBeGreaterThanOrEqual(1);
-
-    const reply = messages.find((m: { replyTo: string }) => m.replyTo === messageId);
-    expect(reply).toBeDefined();
+    // Read response from sender's SSE stream
+    const { value } = await reader.read();
+    const text = decoder.decode(value);
+    const jsonStr = text.split("data: ")[1].split("\n")[0];
+    const reply = JSON.parse(jsonStr) as InboxMessage;
     expect(reply.content).toBe("Response to: What notes do you have?");
+    expect(reply.replyTo).toBe(messageId);
 
+    abortController.abort();
     await agent.shutdown();
   }, 15_000);
 
@@ -89,23 +96,16 @@ describe("agent", () => {
       project: "test",
       delegatesDir: join(fixturesDir, "delegates"),
       delegateRunner: async () => { throw new Error("should not be called"); },
-      pollIntervalMs: 100,
     });
 
-    // Manually put a reply message in the agent's inbox
-    const regRes = await fetch(`http://localhost:${port}/agents`);
-    const agents = await regRes.json();
-    const agentPeerId = agents[0].peerId;
-
-    // Send a replyTo message to the agent's inbox (simulating a response coming back)
-    // We need to register another peer first to be the "from"
+    // Register another peer
     await fetch(`http://localhost:${port}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ project: "other", agents: [{ name: "bot", description: "Bot" }] }),
     });
 
-    // This is a response (replyTo set), agent should NOT process it with delegateRunner
+    // Send a replyTo message (agent should NOT process it with delegateRunner)
     await fetch(`http://localhost:${port}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -117,8 +117,8 @@ describe("agent", () => {
       }),
     });
 
-    // Wait for polling
-    await new Promise((r) => setTimeout(r, 300));
+    // Give SSE time to deliver
+    await new Promise((r) => setTimeout(r, 200));
 
     // If delegateRunner was called, the test would have thrown
     await agent.shutdown();

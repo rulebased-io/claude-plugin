@@ -8,7 +8,6 @@ export interface LocalAgentOptions {
   project: string;
   delegatesDir: string;
   delegateRunner: DelegateRunner;
-  pollIntervalMs?: number;
 }
 
 export interface LocalAgent {
@@ -19,7 +18,6 @@ export interface LocalAgent {
 
 export async function createLocalAgent(opts: LocalAgentOptions): Promise<LocalAgent> {
   const delegates = loadAllDelegates(opts.delegatesDir);
-  const pollInterval = opts.pollIntervalMs ?? 1000;
 
   const regRes = await fetch(`${opts.serverUrl}/register`, {
     method: "POST",
@@ -42,84 +40,97 @@ export async function createLocalAgent(opts: LocalAgentOptions): Promise<LocalAg
     delegateMap.set(d.name, d);
   }
 
-  let running = true;
-
-  const poll = async (): Promise<void> => {
-    while (running) {
-      try {
-        const res = await fetch(`${opts.serverUrl}/messages/inbox?peerId=${peerId}`);
-        if (res.ok) {
-          const { messages } = (await res.json()) as { messages: InboxMessage[] };
-          const processedIds: string[] = [];
-
-          for (const msg of messages) {
-            // Skip response messages (replyTo is set)
-            if (msg.replyTo) {
-              continue;
-            }
-
-            const delegate = delegateMap.get(msg.agentName);
-            if (!delegate) continue;
-
-            try {
-              const response = await opts.delegateRunner(delegate.name, delegate.body, msg.content);
-              await fetch(`${opts.serverUrl}/messages`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  from: `${opts.project}:${msg.agentName}`,
-                  to: msg.from,
-                  content: response,
-                  replyTo: msg.messageId,
-                }),
-              });
-            } catch {
-              await fetch(`${opts.serverUrl}/messages`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  from: `${opts.project}:${msg.agentName}`,
-                  to: msg.from,
-                  content: "[Error: delegate failed to respond]",
-                  replyTo: msg.messageId,
-                }),
-              });
-            }
-
-            processedIds.push(msg.messageId);
-          }
-
-          if (processedIds.length > 0) {
-            await fetch(`${opts.serverUrl}/messages/ack`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ peerId, messageIds: processedIds }),
-            });
-          }
-        }
-      } catch {
-        // Server unreachable, retry next poll
-      }
-
-      if (running) {
-        await new Promise((r) => setTimeout(r, pollInterval));
-      }
-    }
-  };
-
-  const pollPromise = poll();
+  // Subscribe to SSE stream for real-time message push
+  const abortController = new AbortController();
+  const ssePromise = subscribeToMessages(opts.serverUrl, peerId, delegateMap, opts, abortController.signal);
 
   return {
     peerId,
     delegates,
     shutdown: async () => {
-      running = false;
+      abortController.abort();
+      await ssePromise.catch(() => {});
       await fetch(`${opts.serverUrl}/unregister`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ peerId }),
       }).catch(() => {});
-      await pollPromise.catch(() => {});
     },
   };
+}
+
+async function subscribeToMessages(
+  serverUrl: string,
+  peerId: string,
+  delegateMap: Map<string, DelegateDefinition>,
+  opts: LocalAgentOptions,
+  signal: AbortSignal,
+): Promise<void> {
+  try {
+    const res = await fetch(`${serverUrl}/messages/subscribe?peerId=${peerId}`, { signal });
+
+    if (!res.ok || !res.body) return;
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (!signal.aborted) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      // Parse SSE events from buffer
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+
+      for (const line of lines) {
+        if (!line.startsWith("data: ")) continue;
+
+        const jsonStr = line.slice(6);
+        let msg: InboxMessage;
+        try {
+          msg = JSON.parse(jsonStr) as InboxMessage;
+        } catch {
+          continue;
+        }
+
+        // Skip response messages (replyTo is set) — those are for the skill to consume
+        if (msg.replyTo) continue;
+
+        const delegate = delegateMap.get(msg.agentName);
+        if (!delegate) continue;
+
+        // Process message with delegate
+        try {
+          const response = await opts.delegateRunner(delegate.name, delegate.body, msg.content);
+          await fetch(`${serverUrl}/messages`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              from: `${opts.project}:${msg.agentName}`,
+              to: msg.from,
+              content: response,
+              replyTo: msg.messageId,
+            }),
+          });
+        } catch {
+          await fetch(`${serverUrl}/messages`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              from: `${opts.project}:${msg.agentName}`,
+              to: msg.from,
+              content: "[Error: delegate failed to respond]",
+              replyTo: msg.messageId,
+            }),
+          });
+        }
+      }
+    }
+  } catch (err) {
+    if (signal.aborted) return;
+    throw err;
+  }
 }

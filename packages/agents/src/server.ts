@@ -13,7 +13,7 @@ interface PeerEntry {
   peerId: string;
   project: string;
   agents: Map<string, AgentInfo>;
-  inbox: InboxMessage[];
+  sseResponse: ServerResponse | null;
 }
 
 interface ServerState {
@@ -61,8 +61,7 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse, state: S
   if (method === "POST" && path === "/register") return handleRegister(res, state, await readBody(req));
   if (method === "POST" && path === "/unregister") return handleUnregister(res, state, await readBody(req));
   if (method === "POST" && path === "/messages") return handleMessage(res, state, await readBody(req));
-  if (method === "GET" && path === "/messages/inbox") return handleInbox(res, state, url.searchParams.get("peerId") ?? "");
-  if (method === "POST" && path === "/messages/ack") return handleAck(res, state, await readBody(req));
+  if (method === "GET" && path === "/messages/subscribe") return handleSubscribe(req, res, state, url.searchParams.get("peerId") ?? "");
 
   sendJson(res, 404, { error: "not_found", message: `${method} ${path} not found` });
 }
@@ -102,7 +101,7 @@ function handleRegister(res: ServerResponse, state: ServerState, body: unknown):
   const agentsMap = new Map<string, AgentInfo>();
   for (const agent of reg.agents) agentsMap.set(agent.name, agent);
 
-  state.peers.set(peerId, { peerId, project: reg.project, agents: agentsMap, inbox: [] });
+  state.peers.set(peerId, { peerId, project: reg.project, agents: agentsMap, sseResponse: null });
   state.projectIndex.set(reg.project, peerId);
   sendJson(res, 200, { peerId, registered: reg.agents.map((a) => `${reg.project}:${a.name}`) });
 }
@@ -111,6 +110,11 @@ function handleUnregister(res: ServerResponse, state: ServerState, body: unknown
   const { peerId } = body as { peerId: string };
   const peer = state.peers.get(peerId);
   if (!peer) { sendJson(res, 404, { error: "peer_not_found", message: "Peer not registered" }); return; }
+
+  // Close SSE connection if open
+  if (peer.sseResponse) {
+    peer.sseResponse.end();
+  }
 
   const unregistered = Array.from(peer.agents.keys()).map((name) => `${peer.project}:${name}`);
   state.projectIndex.delete(peer.project);
@@ -141,25 +145,40 @@ function handleMessage(res: ServerResponse, state: ServerState, body: unknown): 
     replyTo: msg.replyTo ?? null,
     timestamp: Date.now(),
   };
-  peer.inbox.push(inboxMsg);
+
+  // Push via SSE if subscriber is connected
+  if (peer.sseResponse && !peer.sseResponse.writableEnded) {
+    peer.sseResponse.write(`data: ${JSON.stringify(inboxMsg)}\n\n`);
+  }
+
   sendJson(res, 200, { messageId });
 }
 
-function handleInbox(res: ServerResponse, state: ServerState, peerId: string): void {
-  if (!peerId || !state.peers.has(peerId)) { sendJson(res, 404, { error: "peer_not_found", message: "Peer not registered" }); return; }
+function handleSubscribe(req: IncomingMessage, res: ServerResponse, state: ServerState, peerId: string): void {
+  if (!peerId || !state.peers.has(peerId)) {
+    sendJson(res, 404, { error: "peer_not_found", message: "Peer not registered" });
+    return;
+  }
+
   const peer = state.peers.get(peerId)!;
-  sendJson(res, 200, { messages: peer.inbox });
-}
 
-function handleAck(res: ServerResponse, state: ServerState, body: unknown): void {
-  const { peerId, messageIds } = body as { peerId: string; messageIds: string[] };
-  if (!peerId || !messageIds) { sendJson(res, 400, { error: "bad_request", message: "Missing 'peerId' or 'messageIds'" }); return; }
-  const peer = state.peers.get(peerId);
-  if (!peer) { sendJson(res, 404, { error: "peer_not_found", message: "Peer not registered" }); return; }
+  // Set up SSE stream
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    "Connection": "keep-alive",
+  });
+  res.write(":ok\n\n");
 
-  const ackSet = new Set(messageIds);
-  peer.inbox = peer.inbox.filter((m) => !ackSet.has(m.messageId));
-  sendJson(res, 200, { acknowledged: messageIds.length });
+  // Store the SSE response for pushing messages
+  peer.sseResponse = res;
+
+  // Clean up on disconnect
+  req.on("close", () => {
+    if (peer.sseResponse === res) {
+      peer.sseResponse = null;
+    }
+  });
 }
 
 function sendJson(res: ServerResponse, status: number, data: unknown): void {

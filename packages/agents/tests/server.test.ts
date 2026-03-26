@@ -1,5 +1,6 @@
 import { createAgentsServer } from "../src/server.js";
 import type { Server } from "node:http";
+import type { InboxMessage } from "../src/types.js";
 
 describe("server", () => {
   let server: Server;
@@ -124,8 +125,8 @@ describe("server", () => {
       expect(res.status).toBe(404);
     });
 
-    it("should queue message in target peer inbox (fire-and-forget)", async () => {
-      const regRes = await fetch(`http://localhost:${port}/register`, {
+    it("should return messageId on success (fire-and-forget)", async () => {
+      await fetch(`http://localhost:${port}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -133,7 +134,6 @@ describe("server", () => {
           agents: [{ name: "researcher", description: "Search" }],
         }),
       });
-      const { peerId } = await regRes.json();
 
       const msgRes = await fetch(`http://localhost:${port}/messages`, {
         method: "POST",
@@ -147,26 +147,65 @@ describe("server", () => {
       const { messageId } = await msgRes.json();
       expect(msgRes.status).toBe(200);
       expect(messageId).toBeDefined();
+    });
+  });
 
-      const inboxRes = await fetch(`http://localhost:${port}/messages/inbox?peerId=${peerId}`);
-      const { messages } = await inboxRes.json();
-      expect(messages).toHaveLength(1);
-      expect(messages[0].content).toBe("Any notes on this?");
-      expect(messages[0].replyTo).toBeNull();
-
-      const ackRes = await fetch(`http://localhost:${port}/messages/ack`, {
+  describe("GET /messages/subscribe (SSE)", () => {
+    it("should push messages in real-time via SSE", async () => {
+      const regRes = await fetch(`http://localhost:${port}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ peerId, messageIds: [messages[0].messageId] }),
+        body: JSON.stringify({
+          project: "brain",
+          agents: [{ name: "researcher", description: "Search" }],
+        }),
       });
-      expect(ackRes.status).toBe(200);
+      const { peerId } = await regRes.json();
 
-      const inbox2 = await fetch(`http://localhost:${port}/messages/inbox?peerId=${peerId}`);
-      const { messages: msgs2 } = await inbox2.json();
-      expect(msgs2).toHaveLength(0);
-    });
+      // Open SSE connection
+      const abortController = new AbortController();
+      const sseRes = await fetch(`http://localhost:${port}/messages/subscribe?peerId=${peerId}`, {
+        signal: abortController.signal,
+      });
+      expect(sseRes.status).toBe(200);
+      expect(sseRes.headers.get("content-type")).toBe("text/event-stream");
 
-    it("should support replyTo for response routing", async () => {
+      const reader = sseRes.body!.getReader();
+      const decoder = new TextDecoder();
+
+      // Read initial ":ok" comment
+      const { value: initValue } = await reader.read();
+      const initText = decoder.decode(initValue);
+      expect(initText).toContain(":ok");
+
+      // Send a message to this peer
+      await fetch(`http://localhost:${port}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: "app:user",
+          to: "brain:researcher",
+          content: "Hello via SSE!",
+        }),
+      });
+
+      // Read the SSE event
+      const { value } = await reader.read();
+      const text = decoder.decode(value);
+      expect(text).toContain("data: ");
+
+      const jsonStr = text.split("data: ")[1].split("\n")[0];
+      const msg = JSON.parse(jsonStr) as InboxMessage;
+      expect(msg.content).toBe("Hello via SSE!");
+      expect(msg.from).toBe("app:user");
+      expect(msg.agentName).toBe("researcher");
+      expect(msg.replyTo).toBeNull();
+
+      abortController.abort();
+    }, 10_000);
+
+    it("should support replyTo in SSE push", async () => {
+      // Register two peers
       const regA = await fetch(`http://localhost:${port}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -180,6 +219,18 @@ describe("server", () => {
         body: JSON.stringify({ project: "brain", agents: [{ name: "researcher", description: "Search" }] }),
       });
 
+      // Subscribe peer A to SSE
+      const abortController = new AbortController();
+      const sseRes = await fetch(`http://localhost:${port}/messages/subscribe?peerId=${peerA}`, {
+        signal: abortController.signal,
+      });
+      const reader = sseRes.body!.getReader();
+      const decoder = new TextDecoder();
+
+      // Skip initial ":ok"
+      await reader.read();
+
+      // A sends to B
       const msgRes = await fetch(`http://localhost:${port}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -191,6 +242,7 @@ describe("server", () => {
       });
       const { messageId } = await msgRes.json();
 
+      // B responds to A with replyTo
       await fetch(`http://localhost:${port}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -202,11 +254,15 @@ describe("server", () => {
         }),
       });
 
-      const inboxRes = await fetch(`http://localhost:${port}/messages/inbox?peerId=${peerA}`);
-      const { messages } = await inboxRes.json();
-      expect(messages).toHaveLength(1);
-      expect(messages[0].content).toBe("Answer!");
-      expect(messages[0].replyTo).toBe(messageId);
-    });
+      // A receives the response via SSE
+      const { value } = await reader.read();
+      const text = decoder.decode(value);
+      const jsonStr = text.split("data: ")[1].split("\n")[0];
+      const msg = JSON.parse(jsonStr) as InboxMessage;
+      expect(msg.content).toBe("Answer!");
+      expect(msg.replyTo).toBe(messageId);
+
+      abortController.abort();
+    }, 10_000);
   });
 });
