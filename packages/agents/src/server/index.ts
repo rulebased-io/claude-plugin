@@ -7,6 +7,7 @@ import { agentRoutes } from "./routes/agents.js";
 import { messageRoutes } from "./routes/messages.js";
 import { ValidationError } from "./validators.js";
 import { StateError } from "../types.js";
+import { setupWebSocket } from "./ws/handler.js";
 
 export { ServerState } from "./state.js";
 export { ValidationError } from "./validators.js";
@@ -44,6 +45,12 @@ export async function createAgentsServer(opts: { port: number }): Promise<Agents
     const httpServer = serve(
       { fetch: app.fetch, port: opts.port, hostname: "127.0.0.1" },
       (info) => {
+        const wss = setupWebSocket(httpServer as unknown as Server, state);
+        const originalClose = (httpServer as unknown as Server).close.bind(httpServer);
+        (httpServer as unknown as Server).close = ((cb?: (err?: Error) => void) => {
+          wss.close();
+          return originalClose(cb);
+        }) as Server["close"];
         resolve({ server: httpServer as unknown as Server, port: info.port, state });
       },
     );
