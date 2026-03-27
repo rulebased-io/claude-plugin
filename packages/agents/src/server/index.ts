@@ -28,7 +28,7 @@ export async function createAgentsServer(opts: { port: number }): Promise<Agents
       return c.json({ error: "bad_request", message: err.message }, 400);
     }
     if (err instanceof StateError) {
-      return c.json({ error: "state_error", message: err.message }, { status: err.status });
+      return c.json({ error: "state_error", message: err.message }, err.status as 400 | 404 | 409);
     }
     return c.json({ error: "internal_error", message: "Unexpected server error" }, 500);
   });

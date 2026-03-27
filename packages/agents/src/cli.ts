@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import { resolve } from "node:path";
-import { createAgentsServer } from "./server.js";
-import { createLocalAgent } from "./agent.js";
+import { createAgentsServer } from "./server/index.js";
+import { createLocalAgent } from "./agent/index.js";
 import { initAgents } from "./initializer.js";
 import { loadConfig, getDelegatesDir } from "./config.js";
 
@@ -19,7 +19,7 @@ function printUsage(): void {
 
   Commands:
     serve                 Start the agents server
-    agent                 Start local agent (register delegates, poll for messages)
+    agent                 Start local agent (register delegates, subscribe via WebSocket)
     init [project-name]   Initialize .rulebased/agents/ structure
     status                Show server status
 
