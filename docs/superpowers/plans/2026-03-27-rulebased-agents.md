@@ -352,22 +352,15 @@ export interface RegisteredAgent {
   peerId: string;
 }
 
-export interface Message {
-  id: string;
-  from: string;
-  to: string;
-  content: string;
-  timestamp: number;
-}
-
 export interface MessageRequest {
   from: string;
   to: string;
   content: string;
+  replyTo?: string;
 }
 
-export interface MessageResponse {
-  response: string;
+export interface MessageAck {
+  messageId: string;
 }
 
 export interface ErrorResponse {
@@ -381,21 +374,18 @@ export interface ServerHealth {
   peers: number;
 }
 
-export interface PendingMessage {
+export interface InboxMessage {
   messageId: string;
   from: string;
+  to: string;
   agentName: string;
   content: string;
+  replyTo: string | null;
   timestamp: number;
 }
 
-export interface PendingMessagesResponse {
-  messages: PendingMessage[];
-}
-
-export interface MessageResult {
-  messageId: string;
-  response: string;
+export interface InboxResponse {
+  messages: InboxMessage[];
 }
 ```
 
@@ -924,7 +914,7 @@ describe("server", () => {
       expect(res.status).toBe(404);
     });
 
-    it("should queue message and return when agent responds", async () => {
+    it("should queue message in target peer inbox (fire-and-forget)", async () => {
       // Register a peer
       const regRes = await fetch(`http://localhost:${port}/register`, {
         method: "POST",
@@ -936,8 +926,8 @@ describe("server", () => {
       });
       const { peerId } = await regRes.json();
 
-      // Send message (async — will be queued as pending)
-      const msgPromise = fetch(`http://localhost:${port}/messages`, {
+      // Send message — returns immediately with messageId
+      const msgRes = await fetch(`http://localhost:${port}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -946,28 +936,76 @@ describe("server", () => {
           content: "Any notes on this?",
         }),
       });
+      const { messageId } = await msgRes.json();
+      expect(msgRes.status).toBe(200);
+      expect(messageId).toBeDefined();
 
-      // Agent polls for pending messages
-      const pendingRes = await fetch(`http://localhost:${port}/messages/pending?peerId=${peerId}`);
-      const { messages } = await pendingRes.json();
+      // Target agent polls inbox
+      const inboxRes = await fetch(`http://localhost:${port}/messages/inbox?peerId=${peerId}`);
+      const { messages } = await inboxRes.json();
       expect(messages).toHaveLength(1);
       expect(messages[0].content).toBe("Any notes on this?");
+      expect(messages[0].replyTo).toBeNull();
 
-      // Agent responds
-      await fetch(`http://localhost:${port}/messages/respond`, {
+      // Agent acks the message
+      const ackRes = await fetch(`http://localhost:${port}/messages/ack`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ peerId, messageIds: [messages[0].messageId] }),
+      });
+      expect(ackRes.status).toBe(200);
+
+      // Inbox is now empty
+      const inbox2 = await fetch(`http://localhost:${port}/messages/inbox?peerId=${peerId}`);
+      const { messages: msgs2 } = await inbox2.json();
+      expect(msgs2).toHaveLength(0);
+    });
+
+    it("should support replyTo for response routing", async () => {
+      // Register two peers
+      const regA = await fetch(`http://localhost:${port}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project: "app", agents: [{ name: "user", description: "User" }] }),
+      });
+      const { peerId: peerA } = await regA.json();
+
+      await fetch(`http://localhost:${port}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project: "brain", agents: [{ name: "researcher", description: "Search" }] }),
+      });
+
+      // A sends to B
+      const msgRes = await fetch(`http://localhost:${port}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messageId: messages[0].messageId,
-          response: "Found 3 related notes.",
+          from: "app:user",
+          to: "brain:researcher",
+          content: "Question?",
+        }),
+      });
+      const { messageId } = await msgRes.json();
+
+      // B responds with replyTo → routed to A's inbox
+      await fetch(`http://localhost:${port}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: "brain:researcher",
+          to: "app:user",
+          content: "Answer!",
+          replyTo: messageId,
         }),
       });
 
-      // Original request resolves
-      const msgRes = await msgPromise;
-      const body = await msgRes.json();
-      expect(msgRes.status).toBe(200);
-      expect(body.response).toBe("Found 3 related notes.");
+      // A checks inbox
+      const inboxRes = await fetch(`http://localhost:${port}/messages/inbox?peerId=${peerA}`);
+      const { messages } = await inboxRes.json();
+      expect(messages).toHaveLength(1);
+      expect(messages[0].content).toBe("Answer!");
+      expect(messages[0].replyTo).toBe(messageId);
     });
   });
 });
@@ -989,6 +1027,7 @@ import type {
   PeerRegistration,
   AgentInfo,
   MessageRequest,
+  InboxMessage,
   ServerHealth,
 } from "./types.js";
 
@@ -996,23 +1035,12 @@ interface PeerEntry {
   peerId: string;
   project: string;
   agents: Map<string, AgentInfo>;
-}
-
-interface PendingMessageEntry {
-  messageId: string;
-  from: string;
-  peerId: string;
-  agentName: string;
-  content: string;
-  timestamp: number;
-  resolve: (response: string) => void;
-  reject: (err: Error) => void;
+  inbox: InboxMessage[];
 }
 
 interface ServerState {
   peers: Map<string, PeerEntry>;
   projectIndex: Map<string, string>; // project -> peerId
-  pendingMessages: Map<string, PendingMessageEntry>; // messageId -> entry
   startTime: number;
 }
 
@@ -1025,7 +1053,6 @@ export async function createAgentsServer(opts: { port: number }): Promise<Agents
   const state: ServerState = {
     peers: new Map(),
     projectIndex: new Map(),
-    pendingMessages: new Map(),
     startTime: Date.now(),
   };
 
@@ -1068,15 +1095,15 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse, state: S
   }
   if (method === "POST" && path === "/messages") {
     const body = await readBody(req);
-    return await handleMessage(res, state, body);
+    return handleMessage(res, state, body);
   }
-  if (method === "GET" && path === "/messages/pending") {
+  if (method === "GET" && path === "/messages/inbox") {
     const peerId = url.searchParams.get("peerId") ?? "";
-    return handlePendingMessages(res, state, peerId);
+    return handleInbox(res, state, peerId);
   }
-  if (method === "POST" && path === "/messages/respond") {
+  if (method === "POST" && path === "/messages/ack") {
     const body = await readBody(req);
-    return handleMessageRespond(res, state, body);
+    return handleAck(res, state, body);
   }
 
   sendJson(res, 404, { error: "not_found", message: `${method} ${path} not found` });
@@ -1128,12 +1155,7 @@ function handleRegister(res: ServerResponse, state: ServerState, body: unknown):
     agentsMap.set(agent.name, agent);
   }
 
-  state.peers.set(peerId, {
-    peerId,
-    project: reg.project,
-    agents: agentsMap,
-    messageHandler: null,
-  });
+  state.peers.set(peerId, { peerId, project: reg.project, agents: agentsMap, inbox: [] });
   state.projectIndex.set(reg.project, peerId);
 
   sendJson(res, 200, {
@@ -1157,7 +1179,7 @@ function handleUnregister(res: ServerResponse, state: ServerState, body: unknown
   sendJson(res, 200, { unregistered });
 }
 
-async function handleMessage(res: ServerResponse, state: ServerState, body: unknown): Promise<void> {
+function handleMessage(res: ServerResponse, state: ServerState, body: unknown): void {
   const msg = body as MessageRequest;
   if (!msg.to || !msg.content) {
     sendJson(res, 400, { error: "bad_request", message: "Missing 'to' or 'content'" });
@@ -1182,77 +1204,48 @@ async function handleMessage(res: ServerResponse, state: ServerState, body: unkn
     return;
   }
 
-  // Queue message and wait for agent to respond via polling
+  // Fire-and-forget: queue message in target peer's inbox
   const messageId = randomUUID();
-  const responsePromise = new Promise<string>((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      state.pendingMessages.delete(messageId);
-      reject(new Error("timeout"));
-    }, 120_000);
+  const inboxMsg: InboxMessage = {
+    messageId,
+    from: msg.from ?? "anonymous",
+    to: msg.to,
+    agentName,
+    content: msg.content,
+    replyTo: msg.replyTo ?? null,
+    timestamp: Date.now(),
+  };
+  peer.inbox.push(inboxMsg);
 
-    state.pendingMessages.set(messageId, {
-      messageId,
-      from: msg.from ?? "anonymous",
-      peerId,
-      agentName,
-      content: msg.content,
-      timestamp: Date.now(),
-      resolve: (response: string) => {
-        clearTimeout(timeout);
-        resolve(response);
-      },
-      reject: (err: Error) => {
-        clearTimeout(timeout);
-        reject(err);
-      },
-    });
-  });
-
-  try {
-    const response = await responsePromise;
-    sendJson(res, 200, { response });
-  } catch {
-    sendJson(res, 504, { error: "timeout", message: `Delegate did not respond within 120s` });
-  }
+  sendJson(res, 200, { messageId });
 }
 
-function handlePendingMessages(res: ServerResponse, state: ServerState, peerId: string): void {
+function handleInbox(res: ServerResponse, state: ServerState, peerId: string): void {
   if (!peerId || !state.peers.has(peerId)) {
     sendJson(res, 404, { error: "peer_not_found", message: "Peer not registered" });
     return;
   }
 
-  const messages = [];
-  for (const entry of state.pendingMessages.values()) {
-    if (entry.peerId === peerId) {
-      messages.push({
-        messageId: entry.messageId,
-        from: entry.from,
-        agentName: entry.agentName,
-        content: entry.content,
-        timestamp: entry.timestamp,
-      });
-    }
-  }
-  sendJson(res, 200, { messages });
+  const peer = state.peers.get(peerId)!;
+  sendJson(res, 200, { messages: peer.inbox });
 }
 
-function handleMessageRespond(res: ServerResponse, state: ServerState, body: unknown): void {
-  const { messageId, response } = body as { messageId: string; response: string };
-  if (!messageId || !response) {
-    sendJson(res, 400, { error: "bad_request", message: "Missing 'messageId' or 'response'" });
+function handleAck(res: ServerResponse, state: ServerState, body: unknown): void {
+  const { peerId, messageIds } = body as { peerId: string; messageIds: string[] };
+  if (!peerId || !messageIds) {
+    sendJson(res, 400, { error: "bad_request", message: "Missing 'peerId' or 'messageIds'" });
     return;
   }
 
-  const entry = state.pendingMessages.get(messageId);
-  if (!entry) {
-    sendJson(res, 404, { error: "message_not_found", message: "Message not found or already responded" });
+  const peer = state.peers.get(peerId);
+  if (!peer) {
+    sendJson(res, 404, { error: "peer_not_found", message: "Peer not registered" });
     return;
   }
 
-  entry.resolve(response);
-  state.pendingMessages.delete(messageId);
-  sendJson(res, 200, { ok: true });
+  const ackSet = new Set(messageIds);
+  peer.inbox = peer.inbox.filter((m) => !ackSet.has(m.messageId));
+  sendJson(res, 200, { acknowledged: messageIds.length });
 }
 
 function sendJson(res: ServerResponse, status: number, data: unknown): void {
@@ -1340,7 +1333,15 @@ describe("agent", () => {
     await agent.shutdown();
   });
 
-  it("should handle incoming messages via polling and delegateRunner", async () => {
+  it("should process incoming messages and send responses via replyTo", async () => {
+    // Register sender peer so it has an inbox for the response
+    const senderReg = await fetch(`http://localhost:${port}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ project: "other", agents: [{ name: "user", description: "User" }] }),
+    });
+    const { peerId: senderPeerId } = await senderReg.json();
+
     const agent = await createLocalAgent({
       serverUrl: `http://localhost:${port}`,
       project: "test",
@@ -1349,8 +1350,8 @@ describe("agent", () => {
       pollIntervalMs: 100, // fast polling for tests
     });
 
-    // Send message — agent's polling loop will pick it up and respond
-    const res = await fetch(`http://localhost:${port}/messages`, {
+    // Send message to test:researcher
+    const msgRes = await fetch(`http://localhost:${port}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1359,9 +1360,20 @@ describe("agent", () => {
         content: "What notes do you have?",
       }),
     });
-    const body = await res.json();
-    expect(res.status).toBe(200);
-    expect(body.response).toBe("Response to: What notes do you have?");
+    const { messageId } = await msgRes.json();
+    expect(msgRes.status).toBe(200);
+
+    // Wait for agent polling to process and respond
+    await new Promise((r) => setTimeout(r, 500));
+
+    // Check sender's inbox for the response
+    const inboxRes = await fetch(`http://localhost:${port}/messages/inbox?peerId=${senderPeerId}`);
+    const { messages } = await inboxRes.json();
+    expect(messages.length).toBeGreaterThanOrEqual(1);
+
+    const reply = messages.find((m: { replyTo: string }) => m.replyTo === messageId);
+    expect(reply).toBeDefined();
+    expect(reply.content).toBe("Response to: What notes do you have?");
 
     await agent.shutdown();
   }, 15_000);
@@ -1378,7 +1390,7 @@ Expected: FAIL
 ```typescript
 // src/agent.ts
 import { loadAllDelegates } from "./delegate.js";
-import type { DelegateDefinition, PendingMessage } from "./types.js";
+import type { DelegateDefinition, InboxMessage } from "./types.js";
 
 export type DelegateRunner = (name: string, systemPrompt: string, userMessage: string) => Promise<string>;
 
@@ -1423,32 +1435,60 @@ export async function createLocalAgent(opts: LocalAgentOptions): Promise<LocalAg
 
   let running = true;
 
-  // Polling loop: check for pending messages and respond
+  // Polling loop: check inbox and process messages
   const poll = async (): Promise<void> => {
     while (running) {
       try {
-        const res = await fetch(`${opts.serverUrl}/messages/pending?peerId=${peerId}`);
+        const res = await fetch(`${opts.serverUrl}/messages/inbox?peerId=${peerId}`);
         if (res.ok) {
-          const { messages } = (await res.json()) as { messages: PendingMessage[] };
+          const { messages } = (await res.json()) as { messages: InboxMessage[] };
+          const processedIds: string[] = [];
+
           for (const msg of messages) {
+            // Skip response messages (replyTo is set) — those are for the skill to read
+            if (msg.replyTo) {
+              continue;
+            }
+
             const delegate = delegateMap.get(msg.agentName);
             if (!delegate) continue;
 
             try {
               const response = await opts.delegateRunner(delegate.name, delegate.body, msg.content);
-              await fetch(`${opts.serverUrl}/messages/respond`, {
+              // Send response back as a new message with replyTo
+              await fetch(`${opts.serverUrl}/messages`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ messageId: msg.messageId, response }),
+                body: JSON.stringify({
+                  from: `${opts.project}:${msg.agentName}`,
+                  to: msg.from,
+                  content: response,
+                  replyTo: msg.messageId,
+                }),
               });
             } catch {
-              // Delegate failed, respond with error
-              await fetch(`${opts.serverUrl}/messages/respond`, {
+              await fetch(`${opts.serverUrl}/messages`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ messageId: msg.messageId, response: "[Error: delegate failed to respond]" }),
+                body: JSON.stringify({
+                  from: `${opts.project}:${msg.agentName}`,
+                  to: msg.from,
+                  content: "[Error: delegate failed to respond]",
+                  replyTo: msg.messageId,
+                }),
               });
             }
+
+            processedIds.push(msg.messageId);
+          }
+
+          // Ack processed messages
+          if (processedIds.length > 0) {
+            await fetch(`${opts.serverUrl}/messages/ack`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ peerId, messageIds: processedIds }),
+            });
           }
         }
       } catch {

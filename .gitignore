@@ -6,6 +6,10 @@ coverage/
 .DS_Store
 tests/tmp-*
 
+# Claude Code / local
+.claude/
+.robota/
+
 # Secrets
 .env
 .env.*

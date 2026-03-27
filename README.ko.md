@@ -20,6 +20,10 @@ AI 에이전트를 위한 하네스 구축 도구. 프로젝트의 하네스 엔
 
 > PKM 방법론 기반: PARA, CODE (Capture→Organize→Distill→Express), Zettelkasten, MOC, Spaced Repetition.
 
+### @rulebased/agents
+
+Claude Code 간 크로스 레포 에이전트 통신 도구. 서로 다른 저장소에서 실행 중인 Claude Code 세션이 경량 로컬 메시지 브로커를 통해 서로를 탐색하고 작업을 위임할 수 있습니다.
+
 ---
 
 ## 설치
@@ -35,6 +39,7 @@ AI 에이전트를 위한 하네스 구축 도구. 프로젝트의 하네스 엔
 # 2단계: 플러그인 설치
 /plugin install rulebased-harness@rulebased
 /plugin install rulebased-second-brain@rulebased
+/plugin install rulebased-agents@rulebased
 ```
 
 2. 또는 개발 중 로컬에서 테스트:
@@ -42,6 +47,7 @@ AI 에이전트를 위한 하네스 구축 도구. 프로젝트의 하네스 엔
 ```bash
 claude --plugin-dir ./packages/harness
 claude --plugin-dir ./packages/second-brain
+claude --plugin-dir ./packages/agents
 ```
 
 ### skills.sh
@@ -187,6 +193,20 @@ PARA 기반 세컨드 브레인 구조를 스캐폴딩합니다:
 
 ---
 
+## Agents 스킬
+
+```
+/rulebased-agents:init    # .rulebased/agents/ 구조 초기화
+/rulebased-agents:create  # 새 delegate 에이전트 정의 파일 생성
+/rulebased-agents:online  # 서버 시작 및 delegate 등록
+/rulebased-agents:offline # 연결 해제 및 delegate 등록 취소
+/rulebased-agents:ask     # 원격 에이전트에 질문 전송
+/rulebased-agents:list    # 등록된 에이전트 목록 조회
+/rulebased-agents:status  # 서버 및 에이전트 연결 상태 확인
+```
+
+---
+
 ## 점수 체계 (Harness)
 
 | 심각도 | 가중치 | 예시 |
@@ -210,11 +230,16 @@ rulebased-plugin (pnpm monorepo)
 │   │   ├── reference/           # Evaluation criteria
 │   │   ├── src/                 # Auditor, recommender, initializer, CLI
 │   │   └── tests/               # Tests + fixtures
-│   └── second-brain/            # @rulebased/second-brain - PKM 도구
-│       ├── skills/              # 11개 스킬 (init, capture, connect, ...)
+│   ├── second-brain/            # @rulebased/second-brain - PKM 도구
+│   │   ├── skills/              # 11개 스킬 (init, capture, connect, ...)
+│   │   ├── commands/            # Claude Code commands
+│   │   ├── scaffold/            # Init 템플릿 및 구조
+│   │   └── docs/                # 공유 문서
+│   └── agents/                  # @rulebased/agents - 크로스 레포 통신
+│       ├── skills/              # 7개 스킬 (init, create, online, offline, ask, list, status)
 │       ├── commands/            # Claude Code commands
-│       ├── scaffold/            # Init 템플릿 및 구조
-│       └── docs/                # 공유 문서
+│       ├── hooks/               # 플러그인 훅
+│       └── src/                 # 서버, 로컬 에이전트, delegate 로더, CLI
 ├── specs/                       # Spec 워크플로우 (todo/done/backlog)
 ├── tasks/                       # Task 워크플로우 (todo/done)
 └── docs/                        # 문서
