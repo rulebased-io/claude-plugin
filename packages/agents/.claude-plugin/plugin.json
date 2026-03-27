@@ -1,7 +1,7 @@
 {
   "name": "rulebased-agents",
   "description": "Cross-repo AI agent communication — init, create, online, offline, ask, list, status",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "rulebased.io"
   },
