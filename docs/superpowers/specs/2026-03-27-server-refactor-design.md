@@ -85,7 +85,9 @@ Encapsulates all state management in a single class. Route handlers call methods
 class ServerState {
   // Peer management
   register(project: string, agents: AgentInfo[]): { peerId: string; registered: string[] }
+    // Throws StateError if project name already registered (409 conflict)
   unregister(peerId: string): { unregistered: string[] }
+    // Also calls removeConnection() to close WS and clean up
   getPeer(peerId: string): PeerEntry | undefined
 
   // Agent lookup
@@ -159,7 +161,13 @@ interface WsMessage {
 5. Agent receives message, processes with delegate, sends response back via WS
 6. Server receives WS message, routes to target peer via `state.routeMessage()`
 
-**Heartbeat:** `ws` library handles ping/pong automatically. Server sends ping every 30s, client responds with pong. If no pong within 10s, connection is considered dead.
+**Heartbeat:** Server calls `ws.ping()` every 30s via `setInterval`. The `ws` library auto-responds with pong on the client side. Server listens for `pong` events and terminates connections that miss 2 consecutive pongs.
+
+**Message routing has two entry points:**
+- `POST /messages` (HTTP) — used by skills via curl. Server calls `state.routeMessage()`.
+- Incoming WS message `{ type: "message" }` — used by agents. Server calls `state.routeMessage()`.
+
+Both entry points converge on `state.routeMessage()` which pushes to the target peer's WS connection. There is no loop risk because `routeMessage` only pushes to the *target* peer, not back to the sender.
 
 ### 4. WebSocket Handler
 
@@ -191,16 +199,48 @@ class AgentWsClient {
 - Handles ping/pong via `ws` library
 - Emits parsed `InboxMessage` objects to callback
 
-### 6. Input Validators
+### 6. Agent Message Processing
+
+`createLocalAgent()` in `agent/index.ts` orchestrates message processing. `AgentWsClient` only handles connection and raw message delivery.
+
+**Flow:**
+1. `AgentWsClient.onMessage` fires with `InboxMessage`
+2. `createLocalAgent` callback checks: if `msg.replyTo` is set, **skip** (it's a response, not a question)
+3. Look up delegate by `msg.agentName` in `delegateMap`
+4. Call `delegateRunner(delegate.name, delegate.body, msg.content)`
+5. Send response via `client.send()` (WebSocket) with `replyTo: msg.messageId`
+6. On delegate error, send `"[Error: delegate failed to respond]"` via same path
+
+**Agents always send responses via WebSocket**, not HTTP POST. Skills (curl) use HTTP POST to send initial messages. This is the key distinction:
+- **Skills → HTTP POST → Server → WS push → Agent**
+- **Agent → WS send → Server → WS push → Target Agent**
+
+### 7. Input Validators
 
 ```typescript
 // server/validators.ts
 validatePeerRegistration(body: unknown): PeerRegistration    // throws ValidationError
 validateMessageRequest(body: unknown): MessageRequest        // throws ValidationError
+validateUnregisterRequest(body: unknown): { peerId: string } // throws ValidationError
 class ValidationError extends Error { ... }
 ```
 
 Runtime validation at system boundaries. Internal code trusts validated types.
+
+## Server Lifecycle
+
+```typescript
+export interface AgentsServerResult {
+  server: Server;   // Node.js http.Server from @hono/node-server
+  port: number;     // Actual port (supports port: 0 for random assignment)
+}
+```
+
+- `@hono/node-server`'s `serve()` returns a Node.js `Server` instance
+- Host binding: `127.0.0.1` (localhost only, no external access)
+- `port: 0` is supported for tests (random port assignment)
+- Hono `notFound` handler returns JSON: `{ error: "not_found", message: "..." }`
+- `from` field in `MessageRequest` is optional, defaults to `"anonymous"` in validator
 
 ## HTTP API (unchanged endpoints)
 
