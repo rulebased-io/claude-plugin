@@ -41,19 +41,30 @@ export interface InboxMessage {
   timestamp: number;
 }
 
-export interface InboxResponse {
-  messages: InboxMessage[];
-}
-
 export interface MessageRequest {
-  from: string;
+  from?: string;
   to: string;
   content: string;
   replyTo?: string;
 }
 
-export interface MessageAck {
-  messageId: string;
+export interface WsMessage {
+  type: string;
+  payload: unknown;
+}
+
+export interface WsConnectedPayload {
+  peerId: string;
+}
+
+export class StateError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+    this.name = "StateError";
+  }
 }
 
 export interface ErrorResponse {

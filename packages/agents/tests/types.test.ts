@@ -2,13 +2,13 @@ import type {
   AgentConfig,
   DelegateDefinition,
   PeerRegistration,
-  AgentInfo,
   InboxMessage,
   MessageRequest,
-  MessageAck,
   ServerHealth,
-  InboxResponse,
+  WsMessage,
+  WsConnectedPayload,
 } from "../src/types.js";
+import { StateError } from "../src/types.js";
 
 describe("types", () => {
   it("should allow creating a valid AgentConfig", () => {
@@ -72,5 +72,17 @@ describe("types", () => {
       replyTo: "orig-msg-id",
     };
     expect(req.replyTo).toBe("orig-msg-id");
+  });
+
+  it("should allow MessageRequest without from", () => {
+    const req: MessageRequest = { to: "brain:researcher", content: "hello" };
+    expect(req.from).toBeUndefined();
+  });
+
+  it("should create StateError with status code", () => {
+    const err = new StateError("duplicate", 409);
+    expect(err.message).toBe("duplicate");
+    expect(err.status).toBe(409);
+    expect(err.name).toBe("StateError");
   });
 });
