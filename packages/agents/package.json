@@ -6,11 +6,11 @@
   "bin": {
     "agents": "dist/cli.js"
   },
-  "main": "dist/server.js",
-  "types": "dist/server.d.ts",
+  "main": "dist/server/index.js",
+  "types": "dist/server/index.d.ts",
   "exports": {
-    "./server": "./dist/server.js",
-    "./agent": "./dist/agent.js",
+    "./server": "./dist/server/index.js",
+    "./agent": "./dist/agent/index.js",
     "./types": "./dist/types.js",
     "./config": "./dist/config.js",
     "./delegate": "./dist/delegate.js",
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",
+    "@types/ws": "^8.18.1",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.5.0"
@@ -42,5 +43,10 @@
     "type": "git",
     "url": "git+https://github.com/rulebased-io/claude-plugin.git"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@hono/node-server": "^1.19.11",
+    "hono": "^4.12.9",
+    "ws": "^8.20.0"
+  }
 }
